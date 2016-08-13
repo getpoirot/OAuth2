@@ -167,25 +167,25 @@ class GrantAuthCode
         $client = $this->assertClient($request, true);
 
         $reqParams = (array) $request->getParsedBody();
-        $code      = \Poirot\Std\emptyCoalesce(@$reqParams['code']);
-        if ($code === null)
+        $authCodeIdentifier = \Poirot\Std\emptyCoalesce(@$reqParams['code']);
+        if ($authCodeIdentifier === null)
             throw new exInvalidRequest;
         
-        $code = $this->repoAuthCode->findByIdentifier($code);
-        if (!$code instanceof iEntityAuthCode)
+        $authCode = $this->repoAuthCode->findByIdentifier($authCodeIdentifier);
+        if (!$authCode instanceof iEntityAuthCode)
             // Code is Revoked!!
             throw new exInvalidRequest;
 
-        if ($code->getClientIdentifier() !== $client->getIdentifier())
+        if ($authCode->getClientIdentifier() !== $client->getIdentifier())
             // Authorization code was not issued to this client
             throw new exInvalidRequest;
 
-        if ($code->getExpiryDateTime()->getTimestamp() < time())
+        if ($authCode->getExpiryDateTime()->getTimestamp() < time())
             // Authorization code has expired
             throw new exInvalidRequest;
 
         $redirectUri = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
-        if ($code->getRedirectUri() !== $redirectUri)
+        if ($authCode->getRedirectUri() !== $redirectUri)
             // Invalid redirect URI
             throw new exInvalidRequest;
 
@@ -200,9 +200,9 @@ class GrantAuthCode
             if ($codeVerifier === null)
                 throw new exInvalidRequest;
 
-            switch ($code->getCodeChallengeMethod()) {
+            switch ($authCode->getCodeChallengeMethod()) {
                 case 'plain':
-                    if (hash_equals($codeVerifier, $code->getCodeChallenge()) === false)
+                    if (hash_equals($codeVerifier, $authCode->getCodeChallenge()) === false)
                         // InvalidGrant, Failed to verify `code_verifier`.
                         throw new exInvalidRequest;
                     break;
@@ -210,7 +210,7 @@ class GrantAuthCode
                     if (
                         hash_equals(
                             urlencode(base64_encode(hash('sha256', $codeVerifier))),
-                            $code->getCodeChallenge()
+                            $authCode->getCodeChallenge()
                         ) === false
                     )
                         // InvalidGrant, Failed to verify `code_verifier`.
@@ -220,7 +220,7 @@ class GrantAuthCode
                     throw new exServerError(
                         sprintf(
                             'Unsupported code challenge method `%s`',
-                            $code->getCodeChallengeMethod()
+                            $authCode->getCodeChallengeMethod()
                         )
                     );
             }
@@ -228,7 +228,7 @@ class GrantAuthCode
         
         ## Issue and persist access + refresh tokens
 
-        $user = $this->repoUser->findByIdentifier($code->getOwnerIdentifier());
+        $user = $this->repoUser->findByIdentifier($authCode->getOwnerIdentifier());
         if (!$user instanceof iEntityUser)
             // Resource Owner Not Found!!
             throw new exInvalidRequest;
@@ -239,6 +239,9 @@ class GrantAuthCode
         $grantResponse = $this->newGrantResponse('access_token');
         $grantResponse->setAccessToken($accToken);
         $grantResponse->setRefreshToken($refToken);
+
+        // Revoke AuthCode
+        $this->repoAuthCode->removeByIdentifier($authCodeIdentifier);
 
         $response = $grantResponse->putOn($response);
         return $response;

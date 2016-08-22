@@ -16,6 +16,7 @@ use Poirot\OAuth2\Server\Response\GrantResponseBearerToken;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+
 class GrantPassword
     extends aGrant
 {
@@ -50,17 +51,26 @@ class GrantPassword
     function respond(ServerRequestInterface $request, ResponseInterface $response)
     {
         $client = $this->assertClient($request, true);
-        $scopes = $this->assertScopes($request, $client->getScope());
+        list($scopeRequested, $scopes) = $this->assertScopes($request, $client->getScope());
+
         $user   = $this->assertUser($request);
-        
+
         $accToken      = $this->issueAccessToken($client, $this->getTtlAccessToken(), $user, $scopes);
         $refToken      = $this->issueRefreshToken($accToken, $this->getTtlRefreshToken());
         
         $grantResponse = $this->newGrantResponse();
         $grantResponse->setAccessToken($accToken);
         $grantResponse->setRefreshToken($refToken);
-        
-        $response = $grantResponse->putOn($response);
+        if (array_diff($scopeRequested, $scopes))
+            // the issued access token scope is different from the
+            // one requested by the client, include the "scope"
+            // response parameter to inform the client of the
+            // actual scope granted.
+            $grantResponse->setExtraParams(array(
+                'scope' => implode(' ' /* Scope Delimiter */, $scopes),
+            ));
+
+        $response = $grantResponse->buildResponse($response);
         return $response;
     }
     
@@ -92,10 +102,12 @@ class GrantPassword
         $password = \Poirot\Std\emptyCoalesce(@$requestParameters['password']);
         
         if (is_null($username) || is_null($password))
+            // 
             throw new exInvalidRequest;
 
-        $user = $this->repoUser->findByUserPass($username, $password);
+        $user = $this->repoUser->findByUserCredential($username, $password);
         if (!$user instanceof iEntityUser)
+            // TODO
             throw new exInvalidCredential;
 
         return $user;

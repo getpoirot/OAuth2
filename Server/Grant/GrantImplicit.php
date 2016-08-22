@@ -78,7 +78,7 @@ class GrantImplicit
         $grantResponse->setExtraParams(array('state' => $state));
         $grantResponse->setRedirectUri($redirect);
         
-        $response = $grantResponse->putOn($response);
+        $response = $grantResponse->buildResponse($response);
         return $response;
     }
     

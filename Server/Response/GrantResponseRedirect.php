@@ -20,7 +20,7 @@ class GrantResponseRedirect
      * @return ResponseInterface Clone copy
      * @throws \Exception
      */
-    function putOn(ResponseInterface $response)
+    function buildResponse(ResponseInterface $response)
     {
         $responseParams = array();
         

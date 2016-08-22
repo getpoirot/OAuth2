@@ -18,7 +18,7 @@ class GrantResponseBearerToken
      * @return ResponseInterface Clone copy
      * @throws \Exception
      */
-    function putOn(ResponseInterface $response)
+    function buildResponse(ResponseInterface $response)
     {
         $AccessToken = $this->getAccessToken();
         if (!$AccessToken instanceof iEntityAccessToken)
@@ -47,7 +47,8 @@ class GrantResponseBearerToken
             ->withHeader('cache-control', 'no-store')
             ->withHeader('content-type', 'application/json; charset=UTF-8');
 
-        $response->getBody()->write(json_encode($responseParams));
+        $content = json_encode($responseParams);
+        $response->getBody()->write($content);
         return $response;
     }
 }

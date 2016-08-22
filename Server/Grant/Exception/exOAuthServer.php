@@ -12,6 +12,6 @@ class exOAuthServer
      */
     final function __construct()
     {
-        parent::__construct(self::EXCEPTION_DEFAULT_MESSAGE, self::EXCEPTION_DEFAULT_CODE);
+        parent::__construct(static::EXCEPTION_DEFAULT_MESSAGE, static::EXCEPTION_DEFAULT_CODE);
     }
 }

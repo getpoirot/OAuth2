@@ -16,5 +16,5 @@ abstract class aGrantResponse
      * 
      * @return ResponseInterface
      */
-    abstract function putOn(ResponseInterface $response); 
+    abstract function buildResponse(ResponseInterface $response); 
 }

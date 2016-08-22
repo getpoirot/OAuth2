@@ -70,7 +70,7 @@ abstract class aGrant
     function canRespondToRequest(ServerRequestInterface $request)
     {
         $requestParameters = (array) $request->getParsedBody();
-
+        
         return (
             array_key_exists('grant_type', $requestParameters)
             && $requestParameters['grant_type'] === $this->getGrantType()
@@ -95,12 +95,12 @@ abstract class aGrant
     {
         if (false === $AuthClient = \Poirot\OAuth2\parseClientIdSecret($request))
             throw new exInvalidRequest;
-        
+
         if ($validateSecretKey)
             $client = $this->repoClient->findByIDSecretKey($AuthClient->clientId, $AuthClient->secretKey);
         else 
             $client = $this->repoClient->findByIdentifier($AuthClient->clientId);
-        
+
         if (!$client instanceof iEntityClient)
             throw new exInvalidClient;
 
@@ -128,7 +128,7 @@ abstract class aGrant
      * @param ServerRequestInterface $request
      * @param array                  $preScopes iClientEntity->getScopes(), ...
      * 
-     * @return string[] Scopes
+     * @return array [ scopeRequested => string[], scopeGranted => string[] ]
      */
     protected function assertScopes(ServerRequestInterface $request, array $preScopes)
     {
@@ -139,17 +139,25 @@ abstract class aGrant
         
         $reqParams = (array) $request->getParsedBody();
         $scopes    = \Poirot\Std\emptyCoalesce(@$reqParams['scope'], $scopes);
+        if (!empty($scopes))
+            $scopes = explode(' ' /* Scope Delimiter */, trim($scopes));
+        else
+            $scopes = array();
         
-        $scopesList = array_filter(
-            explode(' ' /* Scope Delimiter */, trim($scopes)),
-            function ($scope) use ($preScopes) {
+        if (empty($scopes)) {
+            $scopes = $preScopes;
+            $scopeGranted = $scopes;
+        }
+        else
+            $scopeGranted = array_filter(
+                $scopes
+                , function ($scope) use ($preScopes) {
                 // Scopes Not Pre-Registered To Client Will Excluded!!
                 // (!) we must back scope to client if it differ 
                 return in_array($scope, $preScopes);
-            }
-        );
+            });
         
-        return $scopesList;
+        return array('scopeRequested' => $scopes, 'scopeGranted' => $scopeGranted, 0 => $scopes, 1 => $scopeGranted);
     }
 
     
@@ -174,7 +182,7 @@ abstract class aGrant
         $curTime = new \DateTime();
         $token->setExpiryDateTime($curTime->add($accessTokenTTL));
         if ($resourceOwner) $token->setOwnerIdentifier($resourceOwner->getIdentifier());
-        
+
         $iToken = $this->repoAccessToken->insert($token);
         return $iToken;
     }

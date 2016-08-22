@@ -9,6 +9,15 @@ use Poirot\OAuth2\Server\Response\GrantResponseBearerToken;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+/*
+POST /token HTTP/1.1
+Host: server.example.com
+Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+*/
+
 class GrantClientCredentials 
     extends aGrant
 {
@@ -34,14 +43,22 @@ class GrantClientCredentials
     function respond(ServerRequestInterface $request, ResponseInterface $response)
     {
         $client = $this->assertClient($request, true);
-        $scopes = $this->assertScopes($request, $client->getScope());
-        
+        list($scopeRequested, $scopes) = $this->assertScopes($request, $client->getScope());
+
         $accToken      = $this->issueAccessToken($client, $this->getTtlAccessToken(), null, $scopes);
         
         $grantResponse = $this->newGrantResponse();
         $grantResponse->setAccessToken($accToken);
-        
-        $response = $grantResponse->putOn($response);
+        if (array_diff($scopeRequested, $scopes))
+            // the issued access token scope is different from the
+            // one requested by the client, include the "scope"
+            // response parameter to inform the client of the
+            // actual scope granted.
+            $grantResponse->setExtraParams(array(
+                'scope' => implode(' ' /* Scope Delimiter */, $scopes),
+            ));
+
+        $response = $grantResponse->buildResponse($response);
         return $response;
     }
     

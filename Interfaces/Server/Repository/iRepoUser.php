@@ -6,20 +6,20 @@ interface iRepoUser
     /**
      * Find User By Identifier
      *
-     * @param string|int $userID
+     * @param string|int $identifier
      *
      * @return iEntityUser|false
      */
-    function findByIdentifier($userID);
+    function findByIdentifier($identifier);
 
     /**
      * Find User By Combination Of Username/Password (identifier/credential)
      *
-     * @param string|int $username
-     * @param string     $password
+     * @param string|int $identifier
+     * @param string     $credential
      *
      * @return iEntityUser|false
      */
-    function findByUserPass($username, $password);
+    function findByUserCredential($identifier, $credential);
     
 }

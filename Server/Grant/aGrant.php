@@ -19,6 +19,7 @@ use Poirot\Std\ConfigurableSetter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+
 abstract class aGrant 
     extends ConfigurableSetter
     implements iGrant

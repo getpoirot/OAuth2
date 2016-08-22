@@ -1,10 +1,11 @@
 <?php
 namespace Poirot\OAuth2\Crypt\OpenSsl;
 
+use Poirot\OAuth2\Interfaces\iEncrypt;
 use Poirot\Std\ConfigurableSetter;
 
 class Crypt 
-    extends ConfigurableSetter
+    implements iEncrypt
 {
     /** @var KeyCrypt */
     protected $privateKey;
@@ -12,6 +13,18 @@ class Crypt
     protected $publicKey;
 
     
+    /**
+     * Crypt constructor.
+     * 
+     * @param KeyCrypt|null $privateKey
+     * @param KeyCrypt|null $publicKey
+     */
+    function __construct(KeyCrypt $privateKey = null, KeyCrypt $publicKey = null)
+    {
+        ($privateKey === null) ?: $this->setPrivateKey($privateKey);
+        ($publicKey === null)  ?: $this->setPublicKey($publicKey);
+    }
+
     /**
      * Encrypt data with a private key.
      *

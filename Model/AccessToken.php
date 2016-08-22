@@ -39,12 +39,12 @@ class AccessToken
      */
     function setIdentifier($identifier)
     {
-        if (! (is_int($identifier) || is_string($identifier)) )
+        if ($identifier !== null && ! (is_int($identifier) || is_string($identifier)) )
             throw new \InvalidArgumentException(sprintf(
                 'Identifier must be int or string; given: (%s).'
                 , \Poirot\Std\flatten($identifier)
             ));
-            
+
         $this->identifier = $identifier;
         return $this;
     }
@@ -68,12 +68,12 @@ class AccessToken
      */
     function setClientIdentifier($clientIdentifier)
     {
-        if (! (is_int($clientIdentifier) || is_string($clientIdentifier)) )
+        if ($clientIdentifier !== null && ! (is_int($clientIdentifier) || is_string($clientIdentifier)) )
             throw new \InvalidArgumentException(sprintf(
                 'Identifier must be int or string; given: (%s).'
                 , \Poirot\Std\flatten($clientIdentifier)
             ));
-        
+
         $this->clientIdentifier = $clientIdentifier;
         return $this;
     }
@@ -174,18 +174,19 @@ class AccessToken
      */
     function setOwnerIdentifier($ownerIdentifier)
     {
-        if (! (is_int($ownerIdentifier) || is_string($ownerIdentifier)) )
+        if ($ownerIdentifier !== null && ! (is_int($ownerIdentifier) || is_string($ownerIdentifier)) )
             throw new \InvalidArgumentException(sprintf(
                 'Identifier must be int or string; given: (%s).'
                 , \Poirot\Std\flatten($ownerIdentifier)
             ));
-        
+
         $this->ownerIdentifier = $ownerIdentifier;
         return $this;
     }
 
     /**
      * Is Token Issued To Resource Owner?
+     * @ignore
      *
      * @return boolean
      */

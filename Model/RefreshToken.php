@@ -12,6 +12,7 @@ class RefreshToken
     protected $identifier;
     /** @var iEntityAccessToken */
     protected $accessToken;
+    protected $accessTokenIdentifier;
 
 
     /**
@@ -52,10 +53,20 @@ class RefreshToken
      */
     function getAccessTokenIdentifier()
     {
-        return $this->accessToken;
+        $accessTokenIdentifer = null;
+        
+        if ($this->accessTokenIdentifier)
+            $accessTokenIdentifer = $this->accessTokenIdentifier;
+        
+        if ($this->accessToken)
+            $accessTokenIdentifer = $this->accessToken->getIdentifier();
+        
+        return $accessTokenIdentifer;
     }
 
     /**
+     * // TODO deprecate this
+     * 
      * @param iEntityAccessToken $accessToken
      * 
      * @return $this

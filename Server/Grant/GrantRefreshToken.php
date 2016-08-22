@@ -52,12 +52,13 @@ class GrantRefreshToken
     {
         $client          = $this->assertClient($request, true);
         $oldRefreshToken = $this->assertRefreshToken($request, $client);
-        $scopes          = $this->assertScopes($request, $oldRefreshToken->getScopes());
+
+        list($scopeRequested, $scopes) =  $this->assertScopes($request, $oldRefreshToken->getScopes());
         
         # Expire old tokens
         $this->repoAccessToken->removeByIdentifier($oldRefreshToken->getAccessTokenIdentifier());
         $this->repoRefreshToken->removeByIdentifier($oldRefreshToken->getIdentifier());
-        
+
         # Issue New Tokens
         $user          = $this->repoUser->findByIdentifier($oldRefreshToken->getOwnerIdentifier());
         if (!$user) 
@@ -69,8 +70,16 @@ class GrantRefreshToken
         $grantResponse = $this->newGrantResponse();
         $grantResponse->setAccessToken($accToken);
         $grantResponse->setRefreshToken($refToken);
-        
-        $response = $grantResponse->putOn($response);
+        if (array_diff($scopeRequested, $scopes))
+            // the issued access token scope is different from the
+            // one requested by the client, include the "scope"
+            // response parameter to inform the client of the
+            // actual scope granted.
+            $grantResponse->setExtraParams(array(
+                'scope' => implode(' ' /* Scope Delimiter */, $scopes),
+            ));
+
+        $response = $grantResponse->buildResponse($response);
         return $response;
     }
     
@@ -99,17 +108,22 @@ class GrantRefreshToken
         $requestParameters      = (array) $request->getParsedBody();
         $refreshTokenIdentifier = \Poirot\Std\emptyCoalesce(@$requestParameters['refresh_token']);
         if (!$refreshTokenIdentifier)
+            // TODO
             throw new exInvalidRequest;
-        
+
         $refreshToken = $this->repoRefreshToken->findByIdentifier($refreshTokenIdentifier);
+
+        die(print_r(\Poirot\Std\cast($refreshToken)->toArray()));
         if (!$refreshToken instanceof iEntityRefreshToken)
-            // Token is Revoked!!
+            // Token is Revoked!! TODO
             throw new exInvalidRefreshToken;
-        
+
         if ($refreshToken->getClientIdentifier() !== $client->getIdentifier())
+            // TODO
             throw new exInvalidRefreshToken;
 
         if ($refreshToken->getExpiryDateTime()->getTimestamp() < time())
+            // TODO
             throw new exInvalidRefreshToken;
         
         return $refreshToken;
@@ -125,7 +139,10 @@ class GrantRefreshToken
      */
     protected function issueRefreshToken(iEntityAccessToken $accessToken, \DateInterval $refreshTokenTTL)
     {
-        $token = new RefreshToken();
+        // refresh token have same data as access token
+        $accessTokenData = \Poirot\Std\cast($accessToken)->toArray();
+
+        $token = new RefreshToken($accessTokenData);
         $token->setAccessToken($accessToken);
         $curTime = new \DateTime();
         $token->setExpiryDateTime($curTime->add($refreshTokenTTL));

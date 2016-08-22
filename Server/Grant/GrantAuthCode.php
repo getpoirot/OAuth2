@@ -312,7 +312,10 @@ class GrantAuthCode
      */
     protected function issueRefreshToken(iEntityAccessToken $accessToken, \DateInterval $refreshTokenTTL)
     {
-        $token = new RefreshToken();
+        // refresh token have same data as access token
+        $accessTokenData = \Poirot\Std\cast($accessToken)->toArray();
+        
+        $token = new RefreshToken($accessTokenData);
         $token->setAccessToken($accessToken);
         $curTime = new \DateTime();
         $token->setExpiryDateTime($curTime->add($refreshTokenTTL));

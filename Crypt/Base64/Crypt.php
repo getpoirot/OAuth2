@@ -15,7 +15,7 @@ class Crypt
      */
     function encrypt($unencryptedData)
     {
-        return base64_encode($unencryptedData);
+        return urlencode(base64_encode(gzcompress($unencryptedData, 9)));
     }
 
     /**
@@ -27,6 +27,6 @@ class Crypt
      */
     function decrypt($encryptedData)
     {
-        return base64_decode($encryptedData);
+        return gzuncompress(base64_decode(urldecode($encryptedData)));
     }
 }

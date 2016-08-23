@@ -313,12 +313,15 @@ class GrantAuthCode
     protected function issueRefreshToken(iEntityAccessToken $accessToken, \DateInterval $refreshTokenTTL)
     {
         // refresh token have same data as access token
-        $accessTokenData = \Poirot\Std\cast($accessToken)->toArray();
-        
-        $token = new RefreshToken($accessTokenData);
-        $token->setAccessToken($accessToken);
         $curTime = new \DateTime();
-        $token->setExpiryDateTime($curTime->add($refreshTokenTTL));
+        $token   = new RefreshToken();
+        $token
+            ->setAccessTokenIdentifier($accessToken->getIdentifier())
+            ->setClientIdentifier($accessToken->getClientIdentifier())
+            ->setScopes($accessToken->getScopes())
+            ->setOwnerIdentifier($accessToken->getOwnerIdentifier())
+            ->setExpiryDateTime($curTime->add($refreshTokenTTL))
+        ;
 
         $iToken = $this->repoRefreshToken->insert($token);
         return $iToken;

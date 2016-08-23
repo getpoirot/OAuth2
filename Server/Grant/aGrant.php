@@ -177,11 +177,14 @@ abstract class aGrant
         , iEntityUser $resourceOwner = null
         , $scopes = array()
     ) {
-        $token = new AccessToken();
-        $token->setScopes($scopes);
-        $token->setClientIdentifier($client->getIdentifier());
         $curTime = new \DateTime();
-        $token->setExpiryDateTime($curTime->add($accessTokenTTL));
+        $token   = new AccessToken();
+        $token
+            ->setScopes($scopes)
+            ->setClientIdentifier($client->getIdentifier())
+            ->setExpiryDateTime($curTime->add($accessTokenTTL))
+        ;
+
         if ($resourceOwner) $token->setOwnerIdentifier($resourceOwner->getIdentifier());
 
         $iToken = $this->repoAccessToken->insert($token);

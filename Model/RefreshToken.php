@@ -10,8 +10,6 @@ class RefreshToken
 {
     /** @var string|int */
     protected $identifier;
-    /** @var iEntityAccessToken */
-    protected $accessToken;
     protected $accessTokenIdentifier;
 
 
@@ -36,7 +34,7 @@ class RefreshToken
      */
     function setIdentifier($identifier)
     {
-        if (! (is_int($identifier) || is_string($identifier)) )
+        if ($identifier !== null && ! (is_int($identifier) || is_string($identifier)) )
             throw new \InvalidArgumentException(sprintf(
                 'Identifier must be int or string; given: (%s).'
                 , \Poirot\Std\flatten($identifier)
@@ -49,32 +47,26 @@ class RefreshToken
     /**
      * Get Access Token That Token Issued To
      *
-     * @return iEntityAccessToken
+     * @return string
      */
     function getAccessTokenIdentifier()
     {
-        $accessTokenIdentifer = null;
-        
-        if ($this->accessTokenIdentifier)
-            $accessTokenIdentifer = $this->accessTokenIdentifier;
-        
-        if ($this->accessToken)
-            $accessTokenIdentifer = $this->accessToken->getIdentifier();
-        
-        return $accessTokenIdentifer;
+        return $this->accessTokenIdentifier;
     }
 
     /**
-     * // TODO deprecate this
-     * 
-     * @param iEntityAccessToken $accessToken
-     * 
+     * @param string $identifier
      * @return $this
      */
-    function setAccessToken($accessToken)
+    function setAccessTokenIdentifier($identifier)
     {
-        $this->accessToken = $accessToken;
+        if ($identifier !== null && ! (is_int($identifier) || is_string($identifier)) )
+            throw new \InvalidArgumentException(sprintf(
+                'Identifier must be int or string; given: (%s).'
+                , \Poirot\Std\flatten($identifier)
+            ));
+        
+        $this->accessTokenIdentifier = (string) $identifier;
         return $this;
     }
-
 }

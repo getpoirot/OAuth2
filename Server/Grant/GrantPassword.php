@@ -102,7 +102,7 @@ class GrantPassword
         $password = \Poirot\Std\emptyCoalesce(@$requestParameters['password']);
         
         if (is_null($username) || is_null($password))
-            // 
+            // TODO
             throw new exInvalidRequest;
 
         $user = $this->repoUser->findByUserCredential($username, $password);

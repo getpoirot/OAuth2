@@ -31,6 +31,7 @@ class GrantAggregateGrants
             if ($grant->canRespondToRequest($request))
                 return $grant->respond($request, $response);
 
+        // TODO
         throw new exInvalidRequest;
     }
 

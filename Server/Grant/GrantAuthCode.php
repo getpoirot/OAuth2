@@ -102,6 +102,7 @@ class GrantAuthCode
         elseif ($this->_isAccessTokenRequest($request))
             return $this->_respondAccessToken($request, $response);
         else
+            // TODO
             throw new exInvalidRequest;
     }
 
@@ -130,10 +131,12 @@ class GrantAuthCode
         if ($this->enableCodeExchangeProof) {
             $codeChallenge = \Poirot\Std\emptyCoalesce(@$reqParams['code_challenge']);
             if ($codeChallenge === null)
+                // TODO
                 throw new exInvalidRequest;
 
             $codeChallengeMethod = \Poirot\Std\emptyCoalesce(@$reqParams['code_challenge_method'], 'plain');
             if (!in_array($codeChallengeMethod, array('plain', 'S256')))
+                // TODO
                 throw new exInvalidRequest;
         }
 
@@ -178,6 +181,7 @@ class GrantAuthCode
         $reqParams = (array) $request->getParsedBody();
         $authCodeIdentifier = \Poirot\Std\emptyCoalesce(@$reqParams['code']);
         if ($authCodeIdentifier === null)
+            // TODO
             throw new exInvalidRequest;
 
         $authCode = $this->repoAuthCode->findByIdentifier($authCodeIdentifier);
@@ -212,12 +216,14 @@ class GrantAuthCode
         if ($this->enableCodeExchangeProof === true) {
             $codeVerifier = \Poirot\Std\emptyCoalesce(@$reqParams['code_verifier']);
             if ($codeVerifier === null)
+                // TODO
                 throw new exInvalidRequest;
 
             switch ($authCode->getCodeChallengeMethod()) {
                 case 'plain':
                     if (hash_equals($codeVerifier, $authCode->getCodeChallenge()) === false)
                         // InvalidGrant, Failed to verify `code_verifier`.
+                        // TODO
                         throw new exInvalidRequest;
                     break;
                 case 'S256':
@@ -228,9 +234,11 @@ class GrantAuthCode
                         ) === false
                     )
                         // InvalidGrant, Failed to verify `code_verifier`.
+                        // TODO
                         throw new exInvalidRequest;
                     break;
                 default:
+                    // TODO
                     throw new exServerError(
                         sprintf(
                             'Unsupported code challenge method `%s`',

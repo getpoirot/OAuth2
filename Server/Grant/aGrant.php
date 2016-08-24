@@ -95,6 +95,7 @@ abstract class aGrant
     protected function assertClient(ServerRequestInterface $request, $validateSecretKey = true)
     {
         if (false === $AuthClient = \Poirot\OAuth2\parseClientIdSecret($request))
+            // TODO
             throw new exInvalidRequest;
 
         if ($validateSecretKey)
@@ -103,6 +104,7 @@ abstract class aGrant
             $client = $this->repoClient->findByIdentifier($AuthClient->clientId);
 
         if (!$client instanceof iEntityClient)
+            // TODO
             throw new exInvalidClient;
 
         // If a redirect URI is provided ensure it matches what is pre-registered
@@ -115,7 +117,8 @@ abstract class aGrant
         $reqParams         = (array) $request->getParsedBody();
         $redirectUri       = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri'], $redirectUri);
         if ( $redirectUri !== null && ! in_array($redirectUri, $client->getRedirectUri()) )
-            ## redirect-uri not match 
+            ## redirect-uri not match
+            // TODO
             throw new exInvalidClient;
 
         return $client;

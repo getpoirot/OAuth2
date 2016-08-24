@@ -85,11 +85,14 @@ namespace Poirot\OAuth2
         try {
             return bin2hex(random_bytes($length));
         } catch (\TypeError $e) {
+            // TODO
             throw new exServerError;
         } catch (\Error $e) {
+            // TODO
             throw new exServerError;
         } catch (\Exception $e) {
             // If you get this message, the CSPRNG failed hard.
+            // TODO
             throw new exServerError;
         }
     }

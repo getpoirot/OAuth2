@@ -2,9 +2,10 @@
 namespace Poirot\OAuth2\Server\Response;
 
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
 
 use Psr\Http\Message\ResponseInterface;
+
+// TODO maybe url encoding needed as setter method or something to build redirect uri
 
 class GrantResponseRedirect
     extends aGrantResponseAccessToken

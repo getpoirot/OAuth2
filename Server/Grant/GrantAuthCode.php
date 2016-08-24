@@ -20,6 +20,7 @@ use Poirot\OAuth2\Server\Response\GrantResponseRedirect;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+
 class GrantAuthCode
     extends aGrant
 {
@@ -114,7 +115,7 @@ class GrantAuthCode
     function _respondAuthorizationCode(ServerRequestInterface $request, ResponseInterface $response)
     {
         $client = $this->assertClient($request, false);
-        $scopes = $this->assertScopes($request, $client->getScope());
+        list($scopeRequested, $scopes) = $this->assertScopes($request, $client->getScope());
 
         // The user approved the client, redirect them back with an authorization code
 
@@ -139,7 +140,15 @@ class GrantAuthCode
 
         # Finalize Response Contains Authorization Code
 
-        $authCode = $this->issueAuthCode($client, $this->getTtlAuthCode(), $user, $redirect, $scopes, $codeChallenge, $codeChallengeMethod);
+        $authCode = $this->issueAuthCode(
+            $client
+            , $this->getTtlAuthCode()
+            , $user
+            , $redirect
+            , $scopes
+            , $codeChallenge
+            , $codeChallengeMethod
+        );
 
         $grantResponse = $this->newGrantResponse('authorization_code');
         $grantResponse->setExtraParams(array(
@@ -148,7 +157,7 @@ class GrantAuthCode
         ));
         $grantResponse->setRedirectUri($redirect);
 
-        $response = $grantResponse->putOn($response);
+        $response = $grantResponse->buildResponse($response);
         return $response;
     }
 
@@ -170,27 +179,32 @@ class GrantAuthCode
         $authCodeIdentifier = \Poirot\Std\emptyCoalesce(@$reqParams['code']);
         if ($authCodeIdentifier === null)
             throw new exInvalidRequest;
-        
+
         $authCode = $this->repoAuthCode->findByIdentifier($authCodeIdentifier);
+
         if (!$authCode instanceof iEntityAuthCode)
             // Code is Revoked!!
+            // TODO
             throw new exInvalidRequest;
 
         if ($authCode->getClientIdentifier() !== $client->getIdentifier())
             // Authorization code was not issued to this client
+            // TODO
             throw new exInvalidRequest;
 
         if ($authCode->getExpiryDateTime()->getTimestamp() < time())
             // Authorization code has expired
+            // TODO
             throw new exInvalidRequest;
 
         $redirectUri = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
         if ($authCode->getRedirectUri() !== $redirectUri)
             // Invalid redirect URI
+            // TODO
             throw new exInvalidRequest;
 
-        
-        $scopes = $this->assertScopes($request, $client->getScope());
+
+        list($scopeRequested, $scopes) = $this->assertScopes($request, $authCode->getScopes());
 
 
         ## Validate code challenge
@@ -231,6 +245,7 @@ class GrantAuthCode
         $user = $this->repoUser->findByIdentifier($authCode->getOwnerIdentifier());
         if (!$user instanceof iEntityUser)
             // Resource Owner Not Found!!
+            // TODO
             throw new exInvalidRequest;
         
         $accToken      = $this->issueAccessToken($client, $this->getTtlAccessToken(), $user, $scopes);
@@ -239,11 +254,19 @@ class GrantAuthCode
         $grantResponse = $this->newGrantResponse('access_token');
         $grantResponse->setAccessToken($accToken);
         $grantResponse->setRefreshToken($refToken);
+        if (array_diff($scopeRequested, $scopes))
+            // the issued access token scope is different from the
+            // one requested by the client, include the "scope"
+            // response parameter to inform the client of the
+            // actual scope granted.
+            $grantResponse->setExtraParams(array(
+                'scope' => implode(' ' /* Scope Delimiter */, $scopes),
+            ));
 
         // Revoke AuthCode
         $this->repoAuthCode->removeByIdentifier($authCodeIdentifier);
 
-        $response = $grantResponse->putOn($response);
+        $response = $grantResponse->buildResponse($response);
         return $response;
     }
 
@@ -287,14 +310,16 @@ class GrantAuthCode
         , $codeChallenge = null
         , $codeChallengeMethod = null
     ) {
-        $token = new AuthCode();
-        $token->setScopes($scopes);
-        $token->setClientIdentifier($client->getIdentifier());
         $curTime = new \DateTime();
-        $token->setExpiryDateTime($curTime->add($authCodeTTL));
-        $token->setOwnerIdentifier($resourceOwner->getIdentifier());
-        $token->setRedirectUri($redirectUri);
-        
+        $token = new AuthCode();
+        $token
+            ->setScopes($scopes)
+            ->setClientIdentifier($client->getIdentifier())
+            ->setExpiryDateTime($curTime->add($authCodeTTL))
+            ->setOwnerIdentifier($resourceOwner->getIdentifier())
+            ->setRedirectUri($redirectUri)
+        ;
+
         (!isset($codeChallenge))       ?: $token->setCodeChallenge($codeChallenge);
         (!isset($codeChallengeMethod)) ?: $token->setCodeChallengeMethod($codeChallengeMethod);
         
@@ -356,10 +381,10 @@ class GrantAuthCode
      */
     function getTtlAuthCode()
     {
-        if (!$this->ttlRefreshToken)
+        if (!$this->ttlAuthCode)
             $this->setTtlAuthCode(new \DateInterval('PT5M'));
 
-        return $this->ttlRefreshToken;
+        return $this->ttlAuthCode;
     }
 
     /**

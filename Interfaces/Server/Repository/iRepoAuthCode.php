@@ -15,9 +15,19 @@ interface iRepoAuthCode
     /**
      * Find Code Match By Identifier
      *
-     * @param string $authCodeIdentifier
+     * @param string $identifier
      *
      * @return iEntityAuthCode|false
      */
-    function findByIdentifier($authCodeIdentifier);
+    function findByIdentifier($identifier);
+
+    /**
+     * Remove Token From Persistence
+     * used to revoke token!
+     *
+     * @param string $tokenIdentifier
+     *
+     * @return void
+     */
+    function removeByIdentifier($tokenIdentifier);
 }

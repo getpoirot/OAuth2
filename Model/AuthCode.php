@@ -18,7 +18,8 @@ class AuthCode
     protected $CodeChallenge;
     protected $CodeChallengeMethod;
     protected $redirectUri;
-    
+
+
     /**
      * Unique Token Identifier
      *
@@ -42,7 +43,7 @@ class AuthCode
      */
     function setIdentifier($identifier)
     {
-        if (! (is_int($identifier) || is_string($identifier)) )
+        if ($identifier !== null && ! (is_int($identifier) || is_string($identifier)) )
             throw new \InvalidArgumentException(sprintf(
                 'Identifier must be int or string; given: (%s).'
                 , \Poirot\Std\flatten($identifier)
@@ -71,7 +72,7 @@ class AuthCode
      */
     function setClientIdentifier($clientIdentifier)
     {
-        if (! (is_int($clientIdentifier) || is_string($clientIdentifier)) )
+        if ($clientIdentifier !== null && ! (is_int($clientIdentifier) || is_string($clientIdentifier)) )
             throw new \InvalidArgumentException(sprintf(
                 'Identifier must be int or string; given: (%s).'
                 , \Poirot\Std\flatten($clientIdentifier)
@@ -177,7 +178,7 @@ class AuthCode
      */
     function setOwnerIdentifier($ownerIdentifier)
     {
-        if (! (is_int($ownerIdentifier) || is_string($ownerIdentifier)) )
+        if ($ownerIdentifier !== null && ! (is_int($ownerIdentifier) || is_string($ownerIdentifier)) )
             throw new \InvalidArgumentException(sprintf(
                 'Identifier must be int or string; given: (%s).'
                 , \Poirot\Std\flatten($ownerIdentifier)
@@ -203,7 +204,7 @@ class AuthCode
      */
     function setRedirectUri($redirectUri)
     {
-        $this->redirectUri = (string) $redirectUri;
+        $this->redirectUri = $redirectUri;
         return $this;
     }
 

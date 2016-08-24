@@ -9,5 +9,12 @@ interface iEntityUser
      * @return string|int
      */
     function getIdentifier();
+
+    /**
+     * Get Credential
+     * 
+     * @return string
+     */
+    function getCredential();
     
 }

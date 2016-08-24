@@ -61,7 +61,7 @@ class GrantImplicit
     function respond(ServerRequestInterface $request, ResponseInterface $response)
     {
         $client = $this->assertClient($request, false);
-        $scopes = $this->assertScopes($request, $client->getScope());
+        list($scopeRequested, $scopes) = $this->assertScopes($request, $client->getScope());
 
         // The user approved the client, redirect them back with an access token
         $user = $this->getUserEntity();
@@ -77,6 +77,14 @@ class GrantImplicit
         $grantResponse->setAccessToken($accToken);
         $grantResponse->setExtraParams(array('state' => $state));
         $grantResponse->setRedirectUri($redirect);
+        if (array_diff($scopeRequested, $scopes))
+            // the issued access token scope is different from the
+            // one requested by the client, include the "scope"
+            // response parameter to inform the client of the
+            // actual scope granted.
+            $grantResponse->setExtraParams(array(
+                'scope' => implode(' ' /* Scope Delimiter */, $scopes),
+            ));
         
         $response = $grantResponse->buildResponse($response);
         return $response;

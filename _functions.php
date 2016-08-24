@@ -48,6 +48,8 @@ namespace Poirot\OAuth2
     /**
      * Build Uri Query Params
      * 
+     * note: function must not responsible for url encoding 
+     * 
      * @param string $uri
      * @param array  $params
      * @param string $queryDelimiter
@@ -57,7 +59,17 @@ namespace Poirot\OAuth2
     function buildUriQueryParams($uri, $params = array(), $queryDelimiter = '?')
     {
         $uri .= (strstr($uri, $queryDelimiter) === false) ? $queryDelimiter : '&';
-        return $uri . http_build_query($params);
+
+        $paramsJoined = array();
+        foreach($params as $param => $value)
+            $paramsJoined[] = "$param=$value";
+        $query = implode('&', $paramsJoined);
+        
+        // url encoded data break tokens structure, then url encoding will happen outside if needed. 
+        #$query = http_build_query($params);
+
+        $uri  = $uri . $query;
+        return $uri;
     }
     
     /**

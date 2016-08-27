@@ -9,7 +9,6 @@ abstract class aGrantResponseAccessToken
     /** @var iEntityAccessToken */
     protected $accessToken;
     protected $refreshToken;
-    protected $extraParams = array();
 
     /**
      * Get Access Token
@@ -56,36 +55,6 @@ abstract class aGrantResponseAccessToken
     function setRefreshToken($refreshToken)
     {
         $this->refreshToken = $refreshToken;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    function getExtraParams()
-    {
-        return $this->extraParams;
-    }
-
-    /**
-     * Set Extra Params
-     * 
-     * @param array|\Traversable $extraParams
-     *
-     * @return $this
-     */
-    function setExtraParams($extraParams)
-    {
-        if ($extraParams instanceof \Traversable)
-            $extraParams = \Poirot\Std\cast($extraParams)->toArray();
-        
-        if (!is_array($extraParams))
-            throw new \InvalidArgumentException(sprintf(
-                'Extra Params Must Instanceof Traversable or Array; given: (%s).'
-                , \Poirot\Std\flatten($extraParams)
-            ));
-        
-        $this->extraParams = $extraParams;
         return $this;
     }
 }

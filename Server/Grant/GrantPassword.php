@@ -7,11 +7,9 @@ use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityUser;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoRefreshToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoUser;
-use Poirot\OAuth2\Server\Grant\Exception\exInvalidCredential;
-use Poirot\OAuth2\Server\Grant\Exception\exInvalidRequest;
-use Poirot\OAuth2\Server\Grant\Exception\exOAuthServer;
+use Poirot\OAuth2\Server\Exception\exOAuthServer;
 use Poirot\OAuth2\Server\Response\aGrantResponseAccessToken;
-use Poirot\OAuth2\Server\Response\GrantResponseBearerToken;
+use Poirot\OAuth2\Server\Response\GrantResponseJson;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -66,7 +64,7 @@ class GrantPassword
             // one requested by the client, include the "scope"
             // response parameter to inform the client of the
             // actual scope granted.
-            $grantResponse->setExtraParams(array(
+            $grantResponse->setParams(array(
                 'scope' => implode(' ' /* Scope Delimiter */, $scopes),
             ));
 
@@ -77,11 +75,11 @@ class GrantPassword
     /**
      * New Grant Response
      *
-     * @return GrantResponseBearerToken|aGrantResponseAccessToken
+     * @return GrantResponseJson|aGrantResponseAccessToken
      */
     function newGrantResponse()
     {
-        return new GrantResponseBearerToken();
+        return new GrantResponseJson();
     }
     
     
@@ -93,7 +91,7 @@ class GrantPassword
      * @param ServerRequestInterface $request
      * 
      * @return iEntityUser
-     * @throws exInvalidCredential|exInvalidRequest
+     * @throws exOAuthServer
      */
     protected function assertUser(ServerRequestInterface $request)
     {
@@ -102,13 +100,11 @@ class GrantPassword
         $password = \Poirot\Std\emptyCoalesce(@$requestParameters['password']);
         
         if (is_null($username) || is_null($password))
-            // TODO
-            throw new exInvalidRequest;
+            throw exOAuthServer::invalidRequest('username|password', null, $this->newGrantResponse());
 
         $user = $this->repoUser->findByUserCredential($username, $password);
         if (!$user instanceof iEntityUser)
-            // TODO
-            throw new exInvalidCredential;
+            throw exOAuthServer::invalidCredentials($this->newGrantResponse());
 
         return $user;
     }

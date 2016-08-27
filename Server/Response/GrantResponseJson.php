@@ -6,7 +6,7 @@ use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
 
 use Psr\Http\Message\ResponseInterface;
 
-class GrantResponseBearerToken
+class GrantResponseJson
     extends aGrantResponseAccessToken
 {
     /**
@@ -20,26 +20,28 @@ class GrantResponseBearerToken
      */
     function buildResponse(ResponseInterface $response)
     {
-        $AccessToken = $this->getAccessToken();
-        if (!$AccessToken instanceof iEntityAccessToken)
-            throw new \Exception('Access Token Not Issued Into Response.');
-
-        $currDateTime   = new \DateTime();
-        $currDateTime   = $currDateTime->getTimestamp();
-        $expireDateTime = $AccessToken->getExpiryDateTime()->getTimestamp();
+        $responseParams = array();
         
-        $responseParams = array(
-            'token_type'   => 'Bearer',
-            'expires_in'   => $expireDateTime - $currDateTime,
-            'access_token' => $AccessToken->getIdentifier(),
-        );
+        if ($this->getAccessToken()) {
+            $AccessToken = $this->getAccessToken();
 
-        # refresh token
-        $RefreshToken = $this->getRefreshToken();
-        if ($RefreshToken instanceof iEntityRefreshToken)
-            $responseParams['refresh_token'] = $RefreshToken->getIdentifier();
+            $currDateTime   = new \DateTime();
+            $currDateTime   = $currDateTime->getTimestamp();
+            $expireDateTime = $AccessToken->getExpiryDateTime()->getTimestamp();
 
-        $responseParams = array_merge($this->getExtraParams(), $responseParams);
+            $responseParams = array(
+                'token_type'   => 'Bearer',
+                'expires_in'   => $expireDateTime - $currDateTime,
+                'access_token' => $AccessToken->getIdentifier(),
+            );
+
+            # refresh token
+            $RefreshToken = $this->getRefreshToken();
+            if ($RefreshToken instanceof iEntityRefreshToken)
+                $responseParams['refresh_token'] = $RefreshToken->getIdentifier();
+        }
+        
+        $responseParams = array_merge($this->getParams(), $responseParams);
 
         $response = $response
             ->withStatus(200)

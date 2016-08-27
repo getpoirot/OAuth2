@@ -1,10 +1,7 @@
 <?php
 namespace Poirot\OAuth2
 {
-    use Poirot\OAuth2\Server\Grant\Exception\exServerError;
-    
     use Poirot\AuthSystem\Authenticate\Identifier\HttpDigest;
-    
     use Psr\Http\Message\ServerRequestInterface;
 
     /**
@@ -78,22 +75,19 @@ namespace Poirot\OAuth2
      * @param int $length
      *
      * @return string
-     * @throws exServerError
+     * @throws \Exception
      */
     function generateUniqueIdentifier($length = 40)
     {
         try {
             return bin2hex(random_bytes($length));
         } catch (\TypeError $e) {
-            // TODO
-            throw new exServerError;
+            throw new \Exception('Server Error While Creating Unique Identifier.');
         } catch (\Error $e) {
-            // TODO
-            throw new exServerError;
+            throw new \Exception('Server Error While Creating Unique Identifier.');
         } catch (\Exception $e) {
             // If you get this message, the CSPRNG failed hard.
-            // TODO
-            throw new exServerError;
+            throw new \Exception('Server Error While Creating Unique Identifier.');
         }
     }
 }

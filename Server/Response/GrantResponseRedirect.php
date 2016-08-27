@@ -41,7 +41,7 @@ class GrantResponseRedirect
             );
         }
         
-        $responseParams = array_merge($this->getExtraParams(), $responseParams);
+        $responseParams = array_merge($this->getParams(), $responseParams);
 
         $redirect = \Poirot\OAuth2\buildUriQueryParams($this->redirectUri, $responseParams, '#');
         $response = $response->withStatus(302)->withHeader('Location', $redirect);

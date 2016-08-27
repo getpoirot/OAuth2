@@ -75,14 +75,14 @@ class GrantImplicit
 
         $grantResponse = $this->newGrantResponse();
         $grantResponse->setAccessToken($accToken);
-        $grantResponse->setExtraParams(array('state' => $state));
+        $grantResponse->setParams(array('state' => $state));
         $grantResponse->setRedirectUri($redirect);
         if (array_diff($scopeRequested, $scopes))
             // the issued access token scope is different from the
             // one requested by the client, include the "scope"
             // response parameter to inform the client of the
             // actual scope granted.
-            $grantResponse->setExtraParams(array(
+            $grantResponse->setParams(array(
                 'scope' => implode(' ' /* Scope Delimiter */, $scopes),
             ));
         

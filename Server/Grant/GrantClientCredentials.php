@@ -4,7 +4,7 @@ namespace Poirot\OAuth2\Server\Grant;
 use Poirot\OAuth2\Server\Grant\Exception\exInvalidRequest;
 use Poirot\OAuth2\Server\Grant\Exception\exOAuthServer;
 use Poirot\OAuth2\Server\Response\aGrantResponseAccessToken;
-use Poirot\OAuth2\Server\Response\GrantResponseBearerToken;
+use Poirot\OAuth2\Server\Response\GrantResponseJson;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -54,7 +54,7 @@ class GrantClientCredentials
             // one requested by the client, include the "scope"
             // response parameter to inform the client of the
             // actual scope granted.
-            $grantResponse->setExtraParams(array(
+            $grantResponse->setParams(array(
                 'scope' => implode(' ' /* Scope Delimiter */, $scopes),
             ));
 
@@ -65,10 +65,10 @@ class GrantClientCredentials
     /**
      * New Grant Response
      *
-     * @return GrantResponseBearerToken|aGrantResponseAccessToken
+     * @return GrantResponseJson|aGrantResponseAccessToken
      */
     function newGrantResponse()
     {
-        return new GrantResponseBearerToken();
+        return new GrantResponseJson();
     }
 }

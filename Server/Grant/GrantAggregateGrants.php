@@ -2,8 +2,7 @@
 namespace Poirot\OAuth2\Server\Grant;
 
 use Poirot\OAuth2\Interfaces\Server\iGrant;
-use Poirot\OAuth2\Server\Grant\Exception\exInvalidRequest;
-use Poirot\OAuth2\Server\Grant\Exception\exOAuthServer;
+use Poirot\OAuth2\Server\Exception\exOAuthServer;
 use Poirot\Std\ConfigurableSetter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,25 +13,28 @@ class GrantAggregateGrants
 {
     /** @var iGrant[] */
     protected $attached_grants = array();
-    
-    
+    /** @var iGrant */
+    protected $lastGrantResponder;
+
+
     /**
      * Respond To Grant Request
      *
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
-     *
+     * 
      * @return ResponseInterface prepared response
-     * @throws exInvalidRequest|exOAuthServer
+     * @throws exOAuthServer
      */
     function respond(ServerRequestInterface $request, ResponseInterface $response)
     {
         foreach ($this->attached_grants as $grant)
-            if ($grant->canRespondToRequest($request))
+            if ($grant->canRespondToRequest($request)) {
+                $this->lastGrantResponder = $grant;
                 return $grant->respond($request, $response);
+            }
 
-        // TODO
-        throw new exInvalidRequest;
+        throw exOAuthServer::unsupportedGrantType();
     }
 
     /**
@@ -52,10 +54,20 @@ class GrantAggregateGrants
         
         return false;
     }
+
+    /**
+     * Get Last Grant Responder
+     * 
+     * @return iGrant|null
+     */
+    function lastGrantResponder()
+    {
+        return $this->lastGrantResponder;
+    }
     
     
     // Options:
-
+    
     /**
      * Set Attached Grants
      * 

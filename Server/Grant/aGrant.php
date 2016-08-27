@@ -8,10 +8,8 @@ use Poirot\OAuth2\Interfaces\Server\Repository\iEntityUser;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoClient;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAccessToken;
 use Poirot\OAuth2\Model\AccessToken;
-use Poirot\OAuth2\Server\Grant\Exception\exInvalidClient;
-use Poirot\OAuth2\Server\Grant\Exception\exInvalidRequest;
-use Poirot\OAuth2\Server\Grant\Exception\exOAuthServer;
 
+use Poirot\OAuth2\Server\Exception\exOAuthServer;
 use Poirot\OAuth2\Server\Response\aGrantResponse;
 
 use Poirot\Std\ConfigurableSetter;
@@ -48,7 +46,7 @@ abstract class aGrant
      * @param ResponseInterface $response
      *
      * @return ResponseInterface prepared response
-     * @throws exInvalidRequest|exOAuthServer
+     * @throws exOAuthServer
      */
     abstract function respond(ServerRequestInterface $request, ResponseInterface $response);
     
@@ -83,20 +81,19 @@ abstract class aGrant
 
     /**
      * Attain and validate Client Credential/ID by Request
-     * 
+     *
      * - check redirect uri match by pre-registered value
      *
      * @param ServerRequestInterface $request
-     * @param bool                   $validateSecretKey Client is confidential 
+     * @param bool $validateSecretKey Client is confidential
      * 
      * @return iEntityClient
-     * @throws exInvalidRequest|exInvalidClient
+     * @throws exOAuthServer
      */
     protected function assertClient(ServerRequestInterface $request, $validateSecretKey = true)
     {
         if (false === $AuthClient = \Poirot\OAuth2\parseClientIdSecret($request))
-            // TODO
-            throw new exInvalidRequest;
+            throw exOAuthServer::invalidRequest('client_id', null, $this->newGrantResponse());
 
         if ($validateSecretKey)
             $client = $this->repoClient->findByIDSecretKey($AuthClient->clientId, $AuthClient->secretKey);
@@ -104,8 +101,7 @@ abstract class aGrant
             $client = $this->repoClient->findByIdentifier($AuthClient->clientId);
 
         if (!$client instanceof iEntityClient)
-            // TODO
-            throw new exInvalidClient;
+            throw exOAuthServer::invalidClient($this->newGrantResponse());
 
         // If a redirect URI is provided ensure it matches what is pre-registered
 
@@ -118,8 +114,7 @@ abstract class aGrant
         $redirectUri       = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri'], $redirectUri);
         if ( $redirectUri !== null && ! in_array($redirectUri, $client->getRedirectUri()) )
             ## redirect-uri not match
-            // TODO
-            throw new exInvalidClient;
+            throw exOAuthServer::invalidClient($this->newGrantResponse());
 
         return $client;
     }

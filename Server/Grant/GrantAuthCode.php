@@ -11,10 +11,8 @@ use Poirot\OAuth2\Interfaces\Server\Repository\iRepoRefreshToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoUser;
 use Poirot\OAuth2\Model\AuthCode;
 use Poirot\OAuth2\Model\RefreshToken;
-use Poirot\OAuth2\Server\Grant\Exception\exInvalidRequest;
-use Poirot\OAuth2\Server\Grant\Exception\exOAuthServer;
-use Poirot\OAuth2\Server\Grant\Exception\exServerError;
-use Poirot\OAuth2\Server\Response\GrantResponseBearerToken;
+use Poirot\OAuth2\Server\Exception\exOAuthServer;
+use Poirot\OAuth2\Server\Response\GrantResponseJson;
 use Poirot\OAuth2\Server\Response\GrantResponseRedirect;
 
 use Psr\Http\Message\ResponseInterface;
@@ -93,7 +91,7 @@ class GrantAuthCode
      * @param ResponseInterface $response
      *
      * @return ResponseInterface prepared response
-     * @throws exInvalidRequest|exOAuthServer
+     * @throws exOAuthServer
      */
     function respond(ServerRequestInterface $request, ResponseInterface $response)
     {
@@ -102,8 +100,7 @@ class GrantAuthCode
         elseif ($this->_isAccessTokenRequest($request))
             return $this->_respondAccessToken($request, $response);
         else
-            // TODO
-            throw new exInvalidRequest;
+            throw exOAuthServer::unsupportedGrantType($this->newGrantResponse());
     }
 
     /**
@@ -111,7 +108,7 @@ class GrantAuthCode
      * @param ResponseInterface $response
      *
      * @return ResponseInterface prepared response
-     * @throws exInvalidRequest|Exception\exInvalidClient|\Exception
+     * @throws exOAuthServer
      */
     function _respondAuthorizationCode(ServerRequestInterface $request, ResponseInterface $response)
     {
@@ -131,13 +128,15 @@ class GrantAuthCode
         if ($this->enableCodeExchangeProof) {
             $codeChallenge = \Poirot\Std\emptyCoalesce(@$reqParams['code_challenge']);
             if ($codeChallenge === null)
-                // TODO
-                throw new exInvalidRequest;
+                throw exOAuthServer::invalidRequest('code_challenge', $this->newGrantResponse());
 
             $codeChallengeMethod = \Poirot\Std\emptyCoalesce(@$reqParams['code_challenge_method'], 'plain');
             if (!in_array($codeChallengeMethod, array('plain', 'S256')))
-                // TODO
-                throw new exInvalidRequest;
+                throw exOAuthServer::invalidRequest(
+                    'code_challenge_method'
+                    , 'Code challenge method must be `plain` or `S256`'
+                    , $this->newGrantResponse()
+                );
         }
 
 
@@ -154,7 +153,7 @@ class GrantAuthCode
         );
 
         $grantResponse = $this->newGrantResponse('authorization_code');
-        $grantResponse->setExtraParams(array(
+        $grantResponse->setParams(array(
             'state' => $state,
             'code'  => $authCode->getIdentifier(),
         ));
@@ -169,10 +168,7 @@ class GrantAuthCode
      * @param ResponseInterface      $response
      * 
      * @return ResponseInterface prepared response
-     * @throws Exception\exInvalidClient
-     * @throws \Exception
-     * @throws exInvalidRequest
-     * @throws exServerError
+     * @throws exOAuthServer
      */
     function _respondAccessToken(ServerRequestInterface $request, ResponseInterface $response)
     {
@@ -181,31 +177,26 @@ class GrantAuthCode
         $reqParams = (array) $request->getParsedBody();
         $authCodeIdentifier = \Poirot\Std\emptyCoalesce(@$reqParams['code']);
         if ($authCodeIdentifier === null)
-            // TODO
-            throw new exInvalidRequest;
+            throw exOAuthServer::invalidRequest('code', null, $this->newGrantResponse());
 
         $authCode = $this->repoAuthCode->findByIdentifier($authCodeIdentifier);
 
         if (!$authCode instanceof iEntityAuthCode)
             // Code is Revoked!!
-            // TODO
-            throw new exInvalidRequest;
+            throw exOAuthServer::invalidRequest('code', 'Authorization code has been revoked', $this->newGrantResponse());
 
         if ($authCode->getClientIdentifier() !== $client->getIdentifier())
             // Authorization code was not issued to this client
-            // TODO
-            throw new exInvalidRequest;
+            throw exOAuthServer::invalidRequest('code', 'Authorization code is invalid', $this->newGrantResponse());
 
         if ($authCode->getExpiryDateTime()->getTimestamp() < time())
             // Authorization code has expired
-            // TODO
-            throw new exInvalidRequest;
+            throw exOAuthServer::invalidRequest('code', 'Authorization code has expired', $this->newGrantResponse());
 
         $redirectUri = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
         if ($authCode->getRedirectUri() !== $redirectUri)
             // Invalid redirect URI
-            // TODO
-            throw new exInvalidRequest;
+            throw exOAuthServer::invalidRequest('redirect_uri', null, $this->newGrantResponse());
 
 
         list($scopeRequested, $scopes) = $this->assertScopes($request, $authCode->getScopes());
@@ -216,15 +207,13 @@ class GrantAuthCode
         if ($this->enableCodeExchangeProof === true) {
             $codeVerifier = \Poirot\Std\emptyCoalesce(@$reqParams['code_verifier']);
             if ($codeVerifier === null)
-                // TODO
-                throw new exInvalidRequest;
+                throw exOAuthServer::invalidRequest('code_verifier', null, $this->newGrantResponse());
 
             switch ($authCode->getCodeChallengeMethod()) {
                 case 'plain':
                     if (hash_equals($codeVerifier, $authCode->getCodeChallenge()) === false)
                         // InvalidGrant, Failed to verify `code_verifier`.
-                        // TODO
-                        throw new exInvalidRequest;
+                        throw exOAuthServer::invalidGrant('Failed to verify `code_verifier`.', $this->newGrantResponse());
                     break;
                 case 'S256':
                     if (
@@ -234,17 +223,13 @@ class GrantAuthCode
                         ) === false
                     )
                         // InvalidGrant, Failed to verify `code_verifier`.
-                        // TODO
-                        throw new exInvalidRequest;
+                        throw exOAuthServer::invalidGrant('Failed to verify `code_verifier`.', $this->newGrantResponse());
                     break;
                 default:
-                    // TODO
-                    throw new exServerError(
-                        sprintf(
-                            'Unsupported code challenge method `%s`',
-                            $authCode->getCodeChallengeMethod()
-                        )
-                    );
+                    throw exOAuthServer::serverError(sprintf(
+                        'Unsupported code challenge method `%s`',
+                        $authCode->getCodeChallengeMethod()
+                    ), $this->newGrantResponse());
             }
         }
         
@@ -253,8 +238,7 @@ class GrantAuthCode
         $user = $this->repoUser->findByIdentifier($authCode->getOwnerIdentifier());
         if (!$user instanceof iEntityUser)
             // Resource Owner Not Found!!
-            // TODO
-            throw new exInvalidRequest;
+            throw exOAuthServer::invalidRequest('code', 'Authorization code has expired', $this->newGrantResponse());
         
         $accToken      = $this->issueAccessToken($client, $this->getTtlAccessToken(), $user, $scopes);
         $refToken      = $this->issueRefreshToken($accToken, $this->getTtlRefreshToken());
@@ -267,7 +251,7 @@ class GrantAuthCode
             // one requested by the client, include the "scope"
             // response parameter to inform the client of the
             // actual scope granted.
-            $grantResponse->setExtraParams(array(
+            $grantResponse->setParams(array(
                 'scope' => implode(' ' /* Scope Delimiter */, $scopes),
             ));
 
@@ -284,13 +268,13 @@ class GrantAuthCode
      *
      * @param string $responseType access_token|authorization_code
      *
-     * @return GrantResponseRedirect|GrantResponseBearerToken
+     * @return GrantResponseRedirect|GrantResponseJson
      * @throws \Exception
      */
     function newGrantResponse($responseType = 'access_token')
     {
         if ($responseType === 'access_token')
-            return new GrantResponseBearerToken();
+            return new GrantResponseJson();
         elseif ($responseType === 'authorization_code')
             return new GrantResponseRedirect();
 

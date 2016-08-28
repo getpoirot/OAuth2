@@ -2,12 +2,12 @@
 namespace Poirot\OAuth2\Server\Grant;
 
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityUser;
-use Poirot\OAuth2\Server\Grant\Exception\exInvalidRequest;
-use Poirot\OAuth2\Server\Grant\Exception\exOAuthServer;
+use Poirot\OAuth2\Server\Exception\exOAuthServer;
 use Poirot\OAuth2\Server\Response\GrantResponseRedirect;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+
 
 class GrantImplicit
     extends aGrant
@@ -37,11 +37,18 @@ class GrantImplicit
      */
     function canRespondToRequest(ServerRequestInterface $request)
     {
+        $return = false;
+
         $requestParameters = $request->getQueryParams();
         $responseType      = \Poirot\Std\emptyCoalesce(@$requestParameters['response_type']);
         $clientIdentifier  = \Poirot\Std\emptyCoalesce(@$requestParameters['client_id']);
 
-        return ($responseType === 'token' && $clientIdentifier !== null);
+        if ($responseType === 'token' && $clientIdentifier !== null) {
+            $return = clone $this;
+            $return->request = $request;
+        }
+
+        return $return;
     }
 
     /**
@@ -52,16 +59,17 @@ class GrantImplicit
      *       otherwise the handle of deny is on behalf of
      *       application structure. maybe you want throw exAccessDenied
      *
-     * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      *
      * @return ResponseInterface prepared response
-     * @throws exInvalidRequest|exOAuthServer
+     * @throws exOAuthServer
      */
-    function respond(ServerRequestInterface $request, ResponseInterface $response)
+    function respond(ResponseInterface $response)
     {
-        $client = $this->assertClient($request, false);
-        list($scopeRequested, $scopes) = $this->assertScopes($request, $client->getScope());
+        $request = $this->request;
+
+        $client = $this->assertClient(false);
+        list($scopeRequested, $scopes) = $this->assertScopes($client->getScope());
 
         // The user approved the client, redirect them back with an access token
         $user = $this->getUserEntity();
@@ -75,18 +83,18 @@ class GrantImplicit
 
         $grantResponse = $this->newGrantResponse();
         $grantResponse->setAccessToken($accToken);
-        $grantResponse->setParams(array('state' => $state));
+        $grantResponse->import(array('state' => $state));
         $grantResponse->setRedirectUri($redirect);
         if (array_diff($scopeRequested, $scopes))
             // the issued access token scope is different from the
             // one requested by the client, include the "scope"
             // response parameter to inform the client of the
             // actual scope granted.
-            $grantResponse->setParams(array(
+            $grantResponse->import(array(
                 'scope' => implode(' ' /* Scope Delimiter */, $scopes),
             ));
         
-        $response = $grantResponse->buildResponse($response);
+        $response = $grantResponse->toResponseWith($response);
         return $response;
     }
     
@@ -97,7 +105,16 @@ class GrantImplicit
      */
     function newGrantResponse()
     {
-        return new GrantResponseRedirect();
+        $request = $this->request;
+
+        $client    = $this->assertClient();
+        $reqParams = $request->getQueryParams();
+        $redirect  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
+        $redirect  = \Poirot\Std\emptyCoalesce( $redirect, current($client->getRedirectUri()) );
+
+        $grantRespose = new GrantResponseRedirect();
+        $grantRespose->setRedirectUri($redirect);
+        return $grantRespose;
     }
 
 

@@ -21,9 +21,11 @@ class GrantResponseRedirect
      * @return ResponseInterface Clone copy
      * @throws \Exception
      */
-    function buildResponse(ResponseInterface $response)
+    function toResponseWith(ResponseInterface $response)
     {
-        $responseParams = array();
+        $responseParams = \Poirot\Std\cast($this)->toArray(function($val) {
+            return $val === null;
+        });
         
         if ($this->getAccessToken()) {
             $AccessToken = $this->getAccessToken();
@@ -40,9 +42,9 @@ class GrantResponseRedirect
                 'access_token' => $AccessToken->getIdentifier(),
             );
         }
-        
-        $responseParams = array_merge($this->getParams(), $responseParams);
 
+        unset($responseParams['redirect_uri']);
+        
         $redirect = \Poirot\OAuth2\buildUriQueryParams($this->redirectUri, $responseParams, '#');
         $response = $response->withStatus(302)->withHeader('Location', $redirect);
         return $response;

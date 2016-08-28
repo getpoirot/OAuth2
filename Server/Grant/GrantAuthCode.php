@@ -61,7 +61,14 @@ class GrantAuthCode
      */
     function canRespondToRequest(ServerRequestInterface $request)
     {
-        return $this->_isAuthorizationRequest($request) || $this->_isAccessTokenRequest($request);
+        $return = false;
+        
+        if ($this->_isAuthorizationRequest($request) || $this->_isAccessTokenRequest($request)) {
+            $return = clone $this;
+            $return->request = $request;
+        }
+        
+        return $return;
     }
 
     protected function _isAuthorizationRequest(ServerRequestInterface $request)
@@ -87,20 +94,19 @@ class GrantAuthCode
      *       otherwise the handle of deny is on behalf of
      *       application structure. maybe you want throw exAccessDenied
      *
-     * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      *
      * @return ResponseInterface prepared response
      * @throws exOAuthServer
      */
-    function respond(ServerRequestInterface $request, ResponseInterface $response)
+    function respond(ResponseInterface $response)
     {
+        $request = $this->request;
+        
         if ($this->_isAuthorizationRequest($request))
             return $this->_respondAuthorizationCode($request, $response);
         elseif ($this->_isAccessTokenRequest($request))
             return $this->_respondAccessToken($request, $response);
-        else
-            throw exOAuthServer::unsupportedGrantType($this->newGrantResponse());
     }
 
     /**
@@ -110,10 +116,10 @@ class GrantAuthCode
      * @return ResponseInterface prepared response
      * @throws exOAuthServer
      */
-    function _respondAuthorizationCode(ServerRequestInterface $request, ResponseInterface $response)
+    protected function _respondAuthorizationCode(ServerRequestInterface $request, ResponseInterface $response)
     {
-        $client = $this->assertClient($request, false);
-        list($scopeRequested, $scopes) = $this->assertScopes($request, $client->getScope());
+        $client = $this->assertClient(false);
+        list($scopeRequested, $scopes) = $this->assertScopes($client->getScope());
 
         // The user approved the client, redirect them back with an authorization code
 
@@ -152,14 +158,14 @@ class GrantAuthCode
             , $codeChallengeMethod
         );
 
-        $grantResponse = $this->newGrantResponse('authorization_code');
-        $grantResponse->setParams(array(
+        $grantResponse = $this->newGrantResponse();
+        $grantResponse->import(array(
             'state' => $state,
             'code'  => $authCode->getIdentifier(),
         ));
         $grantResponse->setRedirectUri($redirect);
 
-        $response = $grantResponse->buildResponse($response);
+        $response = $grantResponse->toResponseWith($response);
         return $response;
     }
 
@@ -170,9 +176,9 @@ class GrantAuthCode
      * @return ResponseInterface prepared response
      * @throws exOAuthServer
      */
-    function _respondAccessToken(ServerRequestInterface $request, ResponseInterface $response)
+    protected function _respondAccessToken(ServerRequestInterface $request, ResponseInterface $response)
     {
-        $client = $this->assertClient($request, true);
+        $client = $this->assertClient(true);
 
         $reqParams = (array) $request->getParsedBody();
         $authCodeIdentifier = \Poirot\Std\emptyCoalesce(@$reqParams['code']);
@@ -199,7 +205,7 @@ class GrantAuthCode
             throw exOAuthServer::invalidRequest('redirect_uri', null, $this->newGrantResponse());
 
 
-        list($scopeRequested, $scopes) = $this->assertScopes($request, $authCode->getScopes());
+        list($scopeRequested, $scopes) = $this->assertScopes($authCode->getScopes());
 
 
         ## Validate code challenge
@@ -243,7 +249,7 @@ class GrantAuthCode
         $accToken      = $this->issueAccessToken($client, $this->getTtlAccessToken(), $user, $scopes);
         $refToken      = $this->issueRefreshToken($accToken, $this->getTtlRefreshToken());
 
-        $grantResponse = $this->newGrantResponse('access_token');
+        $grantResponse = $this->newGrantResponse();
         $grantResponse->setAccessToken($accToken);
         $grantResponse->setRefreshToken($refToken);
         if (array_diff($scopeRequested, $scopes))
@@ -251,14 +257,14 @@ class GrantAuthCode
             // one requested by the client, include the "scope"
             // response parameter to inform the client of the
             // actual scope granted.
-            $grantResponse->setParams(array(
+            $grantResponse->import(array(
                 'scope' => implode(' ' /* Scope Delimiter */, $scopes),
             ));
 
         // Revoke AuthCode
         $this->repoAuthCode->removeByIdentifier($authCodeIdentifier);
 
-        $response = $grantResponse->buildResponse($response);
+        $response = $grantResponse->toResponseWith($response);
         return $response;
     }
 
@@ -266,19 +272,25 @@ class GrantAuthCode
     /**
      * New Grant Response
      *
-     * @param string $responseType access_token|authorization_code
-     *
      * @return GrantResponseRedirect|GrantResponseJson
      * @throws \Exception
      */
-    function newGrantResponse($responseType = 'access_token')
+    function newGrantResponse()
     {
-        if ($responseType === 'access_token')
-            return new GrantResponseJson();
-        elseif ($responseType === 'authorization_code')
-            return new GrantResponseRedirect();
+        $request = $this->request;
 
-        throw new \Exception();
+        if ($this->_isAuthorizationRequest($request)) {
+            $client    = $this->assertClient();
+            $reqParams = $request->getQueryParams();
+            $redirect  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
+            $redirect  = \Poirot\Std\emptyCoalesce( $redirect, current($client->getRedirectUri()) );
+
+            $grantRespose = new GrantResponseRedirect();
+            $grantRespose->setRedirectUri($redirect);
+            return $grantRespose;
+        }
+
+        return new GrantResponseJson();
     }
 
     /**

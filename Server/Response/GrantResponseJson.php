@@ -1,7 +1,6 @@
 <?php
 namespace Poirot\OAuth2\Server\Response;
 
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
 
 use Psr\Http\Message\ResponseInterface;
@@ -18,9 +17,11 @@ class GrantResponseJson
      * @return ResponseInterface Clone copy
      * @throws \Exception
      */
-    function buildResponse(ResponseInterface $response)
+    function toResponseWith(ResponseInterface $response)
     {
-        $responseParams = array();
+        $responseParams = \Poirot\Std\cast($this)->toArray(function($val) {
+            return $val === null;
+        });
         
         if ($this->getAccessToken()) {
             $AccessToken = $this->getAccessToken();
@@ -41,8 +42,6 @@ class GrantResponseJson
                 $responseParams['refresh_token'] = $RefreshToken->getIdentifier();
         }
         
-        $responseParams = array_merge($this->getParams(), $responseParams);
-
         $response = $response
             ->withStatus(200)
             ->withHeader('pragma', 'no-cache')

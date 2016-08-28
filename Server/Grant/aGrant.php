@@ -27,10 +27,16 @@ abstract class aGrant
     /** @var iRepoAccessToken */
     protected $repoAccessToken;
     
-    
     /** @var \DateInterval */
     protected $ttlAccessToken;
     
+    
+    /** @var ServerRequestInterface Prepared request object from canRespond */
+    protected $request;
+    
+    protected $_c_assert_client;
+    protected $_c_assert_scopes;
+
 
     /**
      * Grant identifier (client_credentials, password, ...)
@@ -38,25 +44,16 @@ abstract class aGrant
      * @return string
      */
     abstract function getGrantType();
-    
+
     /**
      * Respond To Grant Request
      *
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     *
+     * @param ResponseInterface  $response
+     * 
      * @return ResponseInterface prepared response
-     * @throws exOAuthServer
      */
-    abstract function respond(ServerRequestInterface $request, ResponseInterface $response);
+    abstract function respond(ResponseInterface $response);
     
-    /**
-     * New Grant Response
-     *
-     * @return aGrantResponse
-     */
-    abstract function newGrantResponse();
-
     /**
      * Can This Grant Respond To Request
      *
@@ -70,11 +67,25 @@ abstract class aGrant
     {
         $requestParameters = (array) $request->getParsedBody();
         
-        return (
+        $return = false;
+        
+        if (
             array_key_exists('grant_type', $requestParameters)
             && $requestParameters['grant_type'] === $this->getGrantType()
-        );
+        ) {
+            $return = clone $this;
+            $return->request = $request;
+        }
+        
+        return $return;
     }
+
+    /**
+     * New Grant Response
+     *
+     * @return aGrantResponse
+     */
+    abstract function newGrantResponse();
     
     
     // Utils:
@@ -84,14 +95,19 @@ abstract class aGrant
      *
      * - check redirect uri match by pre-registered value
      *
-     * @param ServerRequestInterface $request
      * @param bool $validateSecretKey Client is confidential
      * 
      * @return iEntityClient
      * @throws exOAuthServer
      */
-    protected function assertClient(ServerRequestInterface $request, $validateSecretKey = true)
+    protected function assertClient($validateSecretKey = true)
     {
+        if ($this->_c_assert_client)
+            return $this->_c_assert_client;
+        
+        
+        $request = $this->request;
+        
         if (false === $AuthClient = \Poirot\OAuth2\parseClientIdSecret($request))
             throw exOAuthServer::invalidRequest('client_id', null, $this->newGrantResponse());
 
@@ -116,7 +132,7 @@ abstract class aGrant
             ## redirect-uri not match
             throw exOAuthServer::invalidClient($this->newGrantResponse());
 
-        return $client;
+        return $this->_c_assert_client = $client;
     }
 
     /**
@@ -124,13 +140,17 @@ abstract class aGrant
      * 
      * ! requested scope must equal or narrow to client/refreshToken pre-registered scopes
      * 
-     * @param ServerRequestInterface $request
      * @param array                  $preScopes iClientEntity->getScopes(), ...
      * 
      * @return array [ scopeRequested => string[], scopeGranted => string[] ]
      */
-    protected function assertScopes(ServerRequestInterface $request, array $preScopes)
+    protected function assertScopes(array $preScopes)
     {
+        if ($this->_c_assert_scopes)
+            return $this->_c_assert_scopes;
+        
+        $request = $this->request;
+        
         // maybe scope find in request query params
         // used in authorization grants like implicit ..
         $reqParams  = $request->getQueryParams();
@@ -156,7 +176,12 @@ abstract class aGrant
                 return in_array($scope, $preScopes);
             });
         
-        return array('scopeRequested' => $scopes, 'scopeGranted' => $scopeGranted, 0 => $scopes, 1 => $scopeGranted);
+        return $this->_c_assert_scopes = array(
+              'scopeRequested' => $scopes
+            , 'scopeGranted' => $scopeGranted
+            , 0 => $scopes
+            , 1 => $scopeGranted
+        );
     }
 
     

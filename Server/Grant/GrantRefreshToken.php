@@ -12,7 +12,7 @@ use Poirot\OAuth2\Server\Response\aGrantResponseAccessToken;
 use Poirot\OAuth2\Server\Response\GrantResponseJson;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+
 
 class GrantRefreshToken
     extends aGrant
@@ -39,18 +39,17 @@ class GrantRefreshToken
     /**
      * Respond To Grant Request
      *
-     * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      *
      * @return ResponseInterface prepared response
-     * @throws exInvalidRequest|exOAuthServer
+     * @throws exOAuthServer
      */
-    function respond(ServerRequestInterface $request, ResponseInterface $response)
+    function respond(ResponseInterface $response)
     {
-        $client          = $this->assertClient($request, true);
-        $oldRefreshToken = $this->assertRefreshToken($request, $client);
+        $client          = $this->assertClient(true);
+        $oldRefreshToken = $this->assertRefreshToken($client);
 
-        list($scopeRequested, $scopes) =  $this->assertScopes($request, $oldRefreshToken->getScopes());
+        list($scopeRequested, $scopes) =  $this->assertScopes($oldRefreshToken->getScopes());
         
         # Expire old tokens
         $this->repoAccessToken->removeByIdentifier($oldRefreshToken->getAccessTokenIdentifier());
@@ -72,11 +71,11 @@ class GrantRefreshToken
             // one requested by the client, include the "scope"
             // response parameter to inform the client of the
             // actual scope granted.
-            $grantResponse->setParams(array(
+            $grantResponse->import(array(
                 'scope' => implode(' ' /* Scope Delimiter */, $scopes),
             ));
 
-        $response = $grantResponse->buildResponse($response);
+        $response = $grantResponse->toResponseWith($response);
         return $response;
     }
     
@@ -94,14 +93,15 @@ class GrantRefreshToken
     // ...
 
     /**
-     * @param ServerRequestInterface $request
      * @param iEntityClient $client
      *
      * @return iEntityRefreshToken
      * @throws exOAuthServer
      */
-    protected function assertRefreshToken(ServerRequestInterface $request, iEntityClient $client)
+    protected function assertRefreshToken(iEntityClient $client)
     {
+        $request = $this->request;
+        
         $requestParameters      = (array) $request->getParsedBody();
         $refreshTokenIdentifier = \Poirot\Std\emptyCoalesce(@$requestParameters['refresh_token']);
         if (!$refreshTokenIdentifier)
@@ -146,6 +146,7 @@ class GrantRefreshToken
         $iToken = $this->repoRefreshToken->insert($token);
         return $iToken;
     }
+    
     
     // Options:
 

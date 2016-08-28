@@ -45,8 +45,8 @@ class exOAuthServer
             $this->responder = new GrantResponseJson;
         
         
-        $this->responder->setParams($this->dataError);
-        $response = $this->responder->buildResponse($response);
+        $this->responder->import($this->dataError);
+        $response = $this->responder->toResponseWith($response);
         return $response;
     }
     
@@ -188,7 +188,7 @@ class exOAuthServer
      *
      * @return static
      */
-    public static function invalidCredentials(aGrantResponse $responder = null)
+    static function invalidCredentials(aGrantResponse $responder = null)
     {
         $err = new DataErrorResponse();
         $err->setError($err::ERR_UNAUTHORIZED_CLIENT);

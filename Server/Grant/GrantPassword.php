@@ -12,7 +12,6 @@ use Poirot\OAuth2\Server\Response\aGrantResponseAccessToken;
 use Poirot\OAuth2\Server\Response\GrantResponseJson;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 
 class GrantPassword
@@ -40,18 +39,17 @@ class GrantPassword
     /**
      * Respond To Grant Request
      *
-     * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      *
      * @return ResponseInterface prepared response
-     * @throws exInvalidRequest|exOAuthServer
+     * @throws exOAuthServer
      */
-    function respond(ServerRequestInterface $request, ResponseInterface $response)
+    function respond(ResponseInterface $response)
     {
-        $client = $this->assertClient($request, true);
-        list($scopeRequested, $scopes) = $this->assertScopes($request, $client->getScope());
+        $client = $this->assertClient(true);
+        list($scopeRequested, $scopes) = $this->assertScopes($client->getScope());
 
-        $user   = $this->assertUser($request);
+        $user   = $this->assertUser();
 
         $accToken      = $this->issueAccessToken($client, $this->getTtlAccessToken(), $user, $scopes);
         $refToken      = $this->issueRefreshToken($accToken, $this->getTtlRefreshToken());
@@ -64,11 +62,11 @@ class GrantPassword
             // one requested by the client, include the "scope"
             // response parameter to inform the client of the
             // actual scope granted.
-            $grantResponse->setParams(array(
+            $grantResponse->import(array(
                 'scope' => implode(' ' /* Scope Delimiter */, $scopes),
             ));
 
-        $response = $grantResponse->buildResponse($response);
+        $response = $grantResponse->toResponseWith($response);
         return $response;
     }
     
@@ -88,19 +86,19 @@ class GrantPassword
     /**
      * Attain User by Request
      *
-     * @param ServerRequestInterface $request
-     * 
      * @return iEntityUser
      * @throws exOAuthServer
      */
-    protected function assertUser(ServerRequestInterface $request)
+    protected function assertUser()
     {
+        $request = $this->request;
+
         $requestParameters = (array) $request->getParsedBody();
         $username = \Poirot\Std\emptyCoalesce(@$requestParameters['username']);
         $password = \Poirot\Std\emptyCoalesce(@$requestParameters['password']);
         
         if (is_null($username) || is_null($password))
-            throw exOAuthServer::invalidRequest('username|password', null, $this->newGrantResponse());
+            throw exOAuthServer::invalidRequest('"username" or "password"', null, $this->newGrantResponse());
 
         $user = $this->repoUser->findByUserCredential($username, $password);
         if (!$user instanceof iEntityUser)
@@ -133,7 +131,8 @@ class GrantPassword
         $iToken = $this->repoRefreshToken->insert($token);
         return $iToken;
     }
-    
+
+
     // Options:
 
     /**

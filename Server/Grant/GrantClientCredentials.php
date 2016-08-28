@@ -1,13 +1,9 @@
 <?php
 namespace Poirot\OAuth2\Server\Grant;
 
-use Poirot\OAuth2\Server\Grant\Exception\exInvalidRequest;
-use Poirot\OAuth2\Server\Grant\Exception\exOAuthServer;
-use Poirot\OAuth2\Server\Response\aGrantResponseAccessToken;
 use Poirot\OAuth2\Server\Response\GrantResponseJson;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /*
 POST /token HTTP/1.1
@@ -30,20 +26,18 @@ class GrantClientCredentials
     {
         return 'client_credentials';
     }
-    
+
     /**
      * Respond To Grant Request
      *
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
+     * @param ResponseInterface  $response
      *
      * @return ResponseInterface prepared response
-     * @throws exInvalidRequest|exOAuthServer
      */
-    function respond(ServerRequestInterface $request, ResponseInterface $response)
+    function respond(ResponseInterface $response)
     {
-        $client = $this->assertClient($request, true);
-        list($scopeRequested, $scopes) = $this->assertScopes($request, $client->getScope());
+        $client = $this->assertClient(true);
+        list($scopeRequested, $scopes) = $this->assertScopes($client->getScope());
 
         $accToken      = $this->issueAccessToken($client, $this->getTtlAccessToken(), null, $scopes);
         
@@ -54,18 +48,18 @@ class GrantClientCredentials
             // one requested by the client, include the "scope"
             // response parameter to inform the client of the
             // actual scope granted.
-            $grantResponse->setParams(array(
+            $grantResponse->import(array(
                 'scope' => implode(' ' /* Scope Delimiter */, $scopes),
             ));
 
-        $response = $grantResponse->buildResponse($response);
+        $response = $grantResponse->toResponseWith($response);
         return $response;
     }
     
     /**
      * New Grant Response
      *
-     * @return GrantResponseJson|aGrantResponseAccessToken
+     * @return GrantResponseJson
      */
     function newGrantResponse()
     {

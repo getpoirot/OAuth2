@@ -10,6 +10,7 @@ abstract class aGrantResponseAccessToken
     protected $accessToken;
     protected $refreshToken;
 
+    
     /**
      * Get Access Token
      * 

@@ -7,34 +7,33 @@ use Poirot\Std\ConfigurableSetter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+
 class GrantAggregateGrants
     extends ConfigurableSetter
     implements iGrant
 {
     /** @var iGrant[] */
     protected $attached_grants = array();
-    /** @var iGrant */
-    protected $lastGrantResponder;
+
+    /** @var iGrant Responder Prepared Grant */
+    protected $grantResponder;
 
 
     /**
      * Respond To Grant Request
      *
-     * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * 
      * @return ResponseInterface prepared response
      * @throws exOAuthServer
      */
-    function respond(ServerRequestInterface $request, ResponseInterface $response)
+    function respond(ResponseInterface $response)
     {
-        foreach ($this->attached_grants as $grant)
-            if ($grant->canRespondToRequest($request)) {
-                $this->lastGrantResponder = $grant;
-                return $grant->respond($request, $response);
-            }
+        $grant = $this->lastGrantResponder();
+        if ($grant === null)
+            throw exOAuthServer::unsupportedGrantType();
 
-        throw exOAuthServer::unsupportedGrantType();
+        return $grant->respond($response);
     }
 
     /**
@@ -44,14 +43,17 @@ class GrantAggregateGrants
      *
      * @param ServerRequestInterface $request
      *
-     * @return boolean
+     * @return iGrant|false Prepared grant with request
      */
     function canRespondToRequest(ServerRequestInterface $request)
     {
-        foreach ($this->attached_grants as $grant)
-            if ($grant->canRespondToRequest($request))
-                return true;
-        
+        foreach ($this->attached_grants as $grant) {
+            if ($grant = $grant->canRespondToRequest($request)) {
+                $this->grantResponder = $grant;
+                return $grant;
+            }
+        }
+
         return false;
     }
 
@@ -62,7 +64,7 @@ class GrantAggregateGrants
      */
     function lastGrantResponder()
     {
-        return $this->lastGrantResponder;
+        return $this->grantResponder;
     }
     
     

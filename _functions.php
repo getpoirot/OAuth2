@@ -30,11 +30,14 @@ namespace Poirot\OAuth2
         // maybe client_id find in request query params
         // used in authorization grants ...
         $reqParams = $request->getQueryParams();
-        $clientId  = \Poirot\Std\emptyCoalesce(@$reqParams['client_id'], $clientId);
-        
-        $reqParams    = (array) $request->getParsedBody();
-        $clientId     = \Poirot\Std\emptyCoalesce(@$reqParams['client_id'], $clientId);
-        $clientSecret = \Poirot\Std\emptyCoalesce(@$reqParams['client_secret'], $clientSecret);
+        if ($QclientId = \Poirot\Std\emptyCoalesce(@$reqParams['client_id']) ) {
+            $clientId  = $QclientId;
+            $clientSecret = null;
+        } else {
+            $reqParams    = (array) $request->getParsedBody();
+            $clientId     = \Poirot\Std\emptyCoalesce(@$reqParams['client_id'], $clientId);
+            $clientSecret = \Poirot\Std\emptyCoalesce(@$reqParams['client_secret'], $clientSecret);
+        }
 
         if (isset($clientId))
             return (object) array('clientId' => $clientId, 'secretKey' => $clientSecret);

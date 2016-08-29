@@ -35,6 +35,4 @@ interface iRepoClient
      * @return iEntityClient|false
      */
     function findByIDSecretKey($clientID, $secretKey);
-
-
 }

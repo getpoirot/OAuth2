@@ -100,24 +100,30 @@ abstract class aGrant
      * @return iEntityClient
      * @throws exOAuthServer
      */
-    protected function assertClient($validateSecretKey = true)
+    function assertClient($validateSecretKey = true)
     {
         if ($this->_c_assert_client)
             return $this->_c_assert_client;
         
         
         $request = $this->request;
-        
         if (false === $AuthClient = \Poirot\OAuth2\parseClientIdSecret($request))
             throw exOAuthServer::invalidRequest('client_id', null, $this->newGrantResponse());
 
-        if ($validateSecretKey)
-            $client = $this->repoClient->findByIDSecretKey($AuthClient->clientId, $AuthClient->secretKey);
-        else 
-            $client = $this->repoClient->findByIdentifier($AuthClient->clientId);
+        try {
+            if ($validateSecretKey)
+                $client = $this->repoClient->findByIDSecretKey($AuthClient->clientId, $AuthClient->secretKey);
+            else
+                $client = $this->repoClient->findByIdentifier($AuthClient->clientId);
+        } catch (\Exception $e) {
+            throw exOAuthServer::serverError('Server Client Database has rise an error.', $this->newGrantResponse());
+        }
 
         if (!$client instanceof iEntityClient)
             throw exOAuthServer::invalidClient($this->newGrantResponse());
+
+        $this->_c_assert_client = $client;
+
 
         // If a redirect URI is provided ensure it matches what is pre-registered
 
@@ -128,11 +134,12 @@ abstract class aGrant
 
         $reqParams         = (array) $request->getParsedBody();
         $redirectUri       = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri'], $redirectUri);
-        if ( $redirectUri !== null && ! in_array($redirectUri, $client->getRedirectUri()) )
+        if ( $redirectUri !== null && ! in_array($redirectUri, $client->getRedirectUri()) ) {
             ## redirect-uri not match
             throw exOAuthServer::invalidClient($this->newGrantResponse());
+        }
 
-        return $this->_c_assert_client = $client;
+        return $client;
     }
 
     /**
@@ -144,7 +151,7 @@ abstract class aGrant
      * 
      * @return array [ scopeRequested => string[], scopeGranted => string[] ]
      */
-    protected function assertScopes(array $preScopes)
+    function assertScopes(array $preScopes)
     {
         if ($this->_c_assert_scopes)
             return $this->_c_assert_scopes;

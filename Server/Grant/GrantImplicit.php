@@ -97,11 +97,11 @@ class GrantImplicit
         $response = $grantResponse->toResponseWith($response);
         return $response;
     }
-    
+
     /**
      * New Grant Response
-     *
      * @return GrantResponseRedirect
+     * @throws exOAuthServer
      */
     function newGrantResponse()
     {
@@ -109,11 +109,18 @@ class GrantImplicit
 
         $client    = $this->assertClient();
         $reqParams = $request->getQueryParams();
-        $redirect  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
-        $redirect  = \Poirot\Std\emptyCoalesce( $redirect, current($client->getRedirectUri()) );
+        $redirectUri  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
+        $redirectUri  = \Poirot\Std\emptyCoalesce( $redirectUri, current($client->getRedirectUri()) );
+
+        if ( $redirectUri !== null && ! in_array($redirectUri, $client->getRedirectUri()) ) {
+            ## redirect-uri not match 
+            // So we must not redirect back the error result to client 
+            // responder as an argument are abandoned!!
+            throw exOAuthServer::invalidClient();
+        }
 
         $grantRespose = new GrantResponseRedirect();
-        $grantRespose->setRedirectUri($redirect);
+        $grantRespose->setRedirectUri($redirectUri);
         return $grantRespose;
     }
 

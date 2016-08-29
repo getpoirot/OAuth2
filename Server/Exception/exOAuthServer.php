@@ -28,6 +28,8 @@ class exOAuthServer
         $this->dataError = $dataError;
         $this->httpResponseCode = $responseCode;
         $this->responder = $responder;
+        
+        parent::__construct($dataError->getErrorDescription());
     }
 
     /**
@@ -56,6 +58,10 @@ class exOAuthServer
         return $this;
     }
     
+    function getError()
+    {
+        return $this->dataError;
+    }
     
     // ..
 
@@ -215,6 +221,26 @@ class exOAuthServer
         $err->setError($err::ERR_INVALID_REQUEST);
         $err->setErrorDescription('The refresh token is invalid.');
         $err->setHint($hint);
+
+        return new static(
+            $err
+            , 400
+            , $responder
+        );
+    }
+
+    /**
+     * Access denied.
+     *
+     * @param aGrantResponse $responder
+     * 
+     * @return static
+     */
+    static function accessDenied(aGrantResponse $responder = null)
+    {
+        $err = new DataErrorResponse();
+        $err->setError($err::ERR_INVALID_GRANT);
+        $err->setErrorDescription('The resource owner or authorization server denied the request.');
 
         return new static(
             $err

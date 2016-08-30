@@ -1,0 +1,13 @@
+
+{
+    "name": "poirot/oauth2"
+    , "authors": [
+        {
+            "name": "Payam Naderi"
+            , "email": "naderi.payam@gmail.com"
+        }
+    ]
+    , "require": {
+        "poirot/psr7-http": "dev-master"
+    }
+}

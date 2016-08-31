@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\OAuth2\Crypt\OpenSsl;
 
+
 class KeyCrypt
 {
     /** @var string */

@@ -1,7 +1,6 @@
 <?php
 namespace Poirot\OAuth2
 {
-    use Poirot\AuthSystem\Authenticate\Identifier\HttpDigest;
     use Psr\Http\Message\ServerRequestInterface;
 
     /**
@@ -23,7 +22,7 @@ namespace Poirot\OAuth2
         $authHeader = $request->getHeaderLine('Authorization');
         if ($authHeader) {
             try {
-                list($clientId, $clientSecret) = HttpDigest\parseBasicAuthorizationHeader($authHeader);
+                list($clientId, $clientSecret) = parseBasicAuthorizationHeader($authHeader);
             } catch (\Exception $e) { }
         }
 
@@ -92,5 +91,36 @@ namespace Poirot\OAuth2
             // If you get this message, the CSPRNG failed hard.
             throw new \Exception('Server Error While Creating Unique Identifier.');
         }
+    }
+
+
+    /**
+     * Parse Basic Authorization Header Value To It's
+     * Credential Values
+     *
+     * Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+     *
+     * @param string $headerValue
+     *
+     * @return array [username=>'', 'password'=>'']
+     * @throws \Exception Invalid Header
+     */
+    function parseBasicAuthorizationHeader($headerValue)
+    {
+        // Decode the Authorization header
+        $auth = substr($headerValue, strlen('Basic '));
+        $auth = base64_decode($auth);
+        if (!$auth)
+            throw new \RuntimeException('Unable to base64_decode Authorization header value');
+
+        if (!ctype_print($auth))
+            throw new \Exception('Invalid or Empty Authorization Credential.');
+
+        $creds = array_filter(explode(':', $auth));
+        if (count($creds) != 2)
+            throw new \Exception('Invalid Authorization Credential; Missing username or password.');
+
+        $credential = array('username' => $creds[0], 'password' => $creds[1], 0=>$creds[0], 1=>$creds[1]);
+        return $credential;
     }
 }

@@ -1,10 +1,10 @@
 <?php
 namespace Poirot\OAuth2\Model;
 
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
-
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAuthCode;
+
 use Poirot\Std\Struct\DataOptionsOpen;
+
 
 class AuthCode 
     extends DataOptionsOpen

@@ -2,7 +2,9 @@
 namespace Poirot\OAuth2\Crypt\OpenSsl;
 
 use Poirot\OAuth2\Interfaces\iEncrypt;
+
 use Poirot\Std\ConfigurableSetter;
+
 
 class Crypt 
     implements iEncrypt

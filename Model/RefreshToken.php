@@ -1,8 +1,8 @@
 <?php
 namespace Poirot\OAuth2\Model;
 
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
+
 
 class RefreshToken 
     extends AccessToken

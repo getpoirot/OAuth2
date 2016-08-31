@@ -8,5 +8,6 @@
     ]
     , "require": {
         "poirot/psr7-http": "dev-devel"
+        , "poirot/std": "dev-devel"
     }
 }

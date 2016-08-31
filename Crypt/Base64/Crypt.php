@@ -3,6 +3,7 @@ namespace Poirot\OAuth2\Crypt\Base64;
 
 use Poirot\OAuth2\Interfaces\iEncrypt;
 
+
 class Crypt
     implements iEncrypt
 {

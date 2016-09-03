@@ -10,6 +10,7 @@
         "poirot/psr7-http": "dev-devel"
         , "poirot/std": "dev-devel"
     }
+    , "target-dir": "Poirot/OAuth2"
     , "autoload"  : {
         "psr-0": {
             "Poirot\\OAuth2": "."

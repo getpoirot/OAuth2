@@ -10,4 +10,12 @@
         "poirot/psr7-http": "dev-devel"
         , "poirot/std": "dev-devel"
     }
+    , "autoload"  : {
+        "psr-0": {
+            "Poirot\\OAuth2": "."
+        }
+        , "files": [
+            "_functions.php"
+        ]
+    }
 }

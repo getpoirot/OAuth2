@@ -57,6 +57,8 @@ class RefreshTokens
     /**
      * Find Token Match By Identifier
      *
+     * note: it must not gather tokens that expired by time
+     *
      * @param string $tokenIdentifier
      *
      * @return iEntityRefreshToken|false
@@ -67,6 +69,11 @@ class RefreshTokens
         $tokenData = unserialize($tokenData);
 
         $token = new RefreshToken($tokenData);
+
+        # check expire time
+        if (\Poirot\OAuth2\checkExpiry($token->getExpiryDateTime()))
+            return false;
+
         $token->setIdentifier($tokenIdentifier); // replace identifier to stateless one
         return $token;
     }

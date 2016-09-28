@@ -14,6 +14,8 @@ interface iRepoRefreshToken
 
     /**
      * Find Token Match By Identifier
+     *
+     * note: it must not gather tokens that expired by time
      * 
      * @param string $tokenIdentifier
      * 

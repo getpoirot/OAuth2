@@ -55,6 +55,8 @@ class AccessTokens
     /**
      * Find Token Match By Identifier
      *
+     * note: it must not gather tokens that expired by time
+     *
      * @param string $tokenIdentifier
      *
      * @return iEntityAccessToken|false
@@ -65,6 +67,11 @@ class AccessTokens
         $tokenData = unserialize($tokenData);
 
         $token = new AccessToken($tokenData);
+        
+        # check expire time 
+        if (\Poirot\OAuth2\checkExpiry($token->getExpiryDateTime()))
+            return false;
+        
         $token->setIdentifier($tokenIdentifier); // replace identifier to stateless one
         return $token;
     }

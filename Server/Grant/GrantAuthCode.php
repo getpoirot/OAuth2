@@ -134,7 +134,7 @@ class GrantAuthCode
         if ($this->enableCodeExchangeProof) {
             $codeChallenge = \Poirot\Std\emptyCoalesce(@$reqParams['code_challenge']);
             if ($codeChallenge === null)
-                throw exOAuthServer::invalidRequest('code_challenge', $this->newGrantResponse());
+                throw exOAuthServer::invalidRequest('code_challenge', null,  $this->newGrantResponse());
 
             $codeChallengeMethod = \Poirot\Std\emptyCoalesce(@$reqParams['code_challenge_method'], 'plain');
             if (!in_array($codeChallengeMethod, array('plain', 'S256')))

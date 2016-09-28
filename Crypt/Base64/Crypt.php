@@ -25,9 +25,14 @@ class Crypt
      * @param $encryptedData
      *
      * @return string
+     * @throws \Exception
      */
     function decrypt($encryptedData)
     {
-        return gzuncompress(base64_decode(urldecode($encryptedData)));
+        $data = base64_decode(urldecode($encryptedData));
+        if (false === $decrypt = @gzuncompress($data))
+            throw new \Exception('Given Encrypted Data is Malformed.');
+
+        return $decrypt;
     }
 }

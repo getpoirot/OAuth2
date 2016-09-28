@@ -61,12 +61,14 @@ class RefreshTokens
      *
      * @param string $tokenIdentifier
      *
-     * @return iEntityRefreshToken|false
+     * @return false|iEntityRefreshToken
+     * @throws \Exception
      */
     function findByIdentifier($tokenIdentifier)
     {
         $tokenData = $this->encryption->decrypt($tokenIdentifier);
-        $tokenData = unserialize($tokenData);
+        if (false === $tokenData = @unserialize($tokenData))
+            throw new \Exception('Error Retrieve Refresh Token; Parse Error!!!');
 
         $token = new RefreshToken($tokenData);
 

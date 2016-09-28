@@ -4,6 +4,23 @@ namespace Poirot\OAuth2
     use Psr\Http\Message\ServerRequestInterface;
 
     /**
+     * Check Expiration Of DateTime
+     *
+     * @param \DateTime $dateTime
+     *
+     * @return boolean
+     */
+    function checkExpiry(\DateTime $dateTime)
+    {
+        $currDateTime   = new \DateTime();
+        $currDateTime   = $currDateTime->getTimestamp();
+
+        $expireDateTime = $dateTime->getTimestamp();
+
+        return ($currDateTime-$expireDateTime > 0);
+    }
+    
+    /**
      * Parse and Retrieve Client ID / Secret Key From Request
      *
      * - it can be on Authorize Header as Basic Authorization

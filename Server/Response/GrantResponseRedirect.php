@@ -36,11 +36,13 @@ class GrantResponseRedirect
             $currDateTime   = $currDateTime->getTimestamp();
             $expireDateTime = $AccessToken->getExpiryDateTime()->getTimestamp();
             
-            $responseParams = array(
+            $tokenParams = array(
                 'token_type'   => 'Bearer',
                 'expires_in'   => $expireDateTime - $currDateTime,
                 'access_token' => $AccessToken->getIdentifier(),
             );
+
+            $responseParams = array_merge($responseParams, $tokenParams);
         }
 
         unset($responseParams['redirect_uri']);

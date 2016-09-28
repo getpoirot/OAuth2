@@ -30,16 +30,19 @@ class GrantResponseJson
             $currDateTime   = $currDateTime->getTimestamp();
             $expireDateTime = $AccessToken->getExpiryDateTime()->getTimestamp();
 
-            $responseParams = array(
+            $tokenParams = array(
                 'token_type'   => 'Bearer',
                 'expires_in'   => $expireDateTime - $currDateTime,
                 'access_token' => $AccessToken->getIdentifier(),
             );
+            (!$clientId = $AccessToken->getClientIdentifier()) ?: $tokenParams['client_id'] = $clientId;
 
             # refresh token
             $RefreshToken = $this->getRefreshToken();
             if ($RefreshToken instanceof iEntityRefreshToken)
-                $responseParams['refresh_token'] = $RefreshToken->getIdentifier();
+                $tokenParams['refresh_token'] = $RefreshToken->getIdentifier();
+
+            $responseParams = array_merge($responseParams, $tokenParams);
         }
         
         $response = $response

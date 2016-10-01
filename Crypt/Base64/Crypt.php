@@ -3,7 +3,6 @@ namespace Poirot\OAuth2\Crypt\Base64;
 
 use Poirot\OAuth2\Interfaces\iEncrypt;
 
-
 class Crypt
     implements iEncrypt
 {
@@ -16,7 +15,7 @@ class Crypt
      */
     function encrypt($unencryptedData)
     {
-        return urlencode(base64_encode(gzcompress($unencryptedData, 9)));
+        return base64_encode(gzcompress($unencryptedData, 9));
     }
 
     /**
@@ -29,7 +28,7 @@ class Crypt
      */
     function decrypt($encryptedData)
     {
-        $data = base64_decode(urldecode($encryptedData));
+        $data = base64_decode($encryptedData);
         if (false === $decrypt = @gzuncompress($data))
             throw new \Exception('Given Encrypted Data is Malformed.');
 

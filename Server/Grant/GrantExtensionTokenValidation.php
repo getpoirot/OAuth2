@@ -86,7 +86,7 @@ class GrantExtensionTokenValidation
         $pToken        = \Poirot\Std\emptyCoalesce(@$requestParameters['token']);
         $pRefreshToken = \Poirot\Std\emptyCoalesce(@$requestParameters['refresh_token']);
 
-        if (is_null($pToken) && is_null($pRefreshToken))
+        if (empty($pToken) && empty($pRefreshToken))
             throw exOAuthServer::invalidRequest('"token" or "refresh_token"', null, $this->newGrantResponse());
 
 

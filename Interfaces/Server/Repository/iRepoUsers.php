@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\OAuth2\Interfaces\Server\Repository;
 
-interface iRepoUser
+interface iRepoUsers
 {
     /**
      * Find User By Identifier (username)

@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\OAuth2\Interfaces\Server\Repository;
 
-interface iRepoClient
+interface iRepoClients
 {
     /**
      * Insert New Client

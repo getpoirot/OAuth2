@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\OAuth2\Interfaces\Server\Repository;
 
-interface iRepoAuthCode
+interface iRepoAuthCodes
 {
     /**
      * Persist New Authorization Code

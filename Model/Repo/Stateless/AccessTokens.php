@@ -3,12 +3,12 @@ namespace Poirot\OAuth2\Model\Repo\Stateless;
 
 use Poirot\OAuth2\Interfaces\iEncrypt;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
-use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAccessToken;
+use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAccessTokens;
 use Poirot\OAuth2\Model\AccessToken;
 
 
 class AccessTokens
-    implements iRepoAccessToken
+    implements iRepoAccessTokens
 {
     /** @var iEncrypt */
     protected $encryption;

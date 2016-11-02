@@ -3,12 +3,12 @@ namespace Poirot\OAuth2\Model\Repo\Stateless;
 
 use Poirot\OAuth2\Interfaces\iEncrypt;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAuthCode;
-use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAuthCode;
+use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAuthCodes;
 use Poirot\OAuth2\Model\AuthCode;
 
 
 class AuthorizationCodes
-    implements iRepoAuthCode
+    implements iRepoAuthCodes
 {
     /** @var iEncrypt */
     protected $encryption;

@@ -5,8 +5,8 @@ use Poirot\OAuth2\Interfaces\Server\iGrant;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityClient;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityUser;
-use Poirot\OAuth2\Interfaces\Server\Repository\iRepoClient;
-use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAccessToken;
+use Poirot\OAuth2\Interfaces\Server\Repository\iRepoClients;
+use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAccessTokens;
 use Poirot\OAuth2\Model\AccessToken;
 
 use Poirot\OAuth2\Server\Exception\exOAuthServer;
@@ -22,9 +22,9 @@ abstract class aGrant
     extends ConfigurableSetter
     implements iGrant
 {
-    /** @var iRepoClient */
+    /** @var iRepoClients */
     protected $repoClient;
-    /** @var iRepoAccessToken */
+    /** @var iRepoAccessTokens */
     protected $repoAccessToken;
     
     /** @var \DateInterval */
@@ -251,13 +251,13 @@ abstract class aGrant
     }
     
     
-    function setRepoClient(iRepoClient $repoClient)
+    function setRepoClient(iRepoClients $repoClient)
     {
         $this->repoClient = $repoClient;
         return $this;
     }
 
-    function setRepoAccessToken(iRepoAccessToken $repoAccessToken)
+    function setRepoAccessToken(iRepoAccessTokens $repoAccessToken)
     {
         $this->repoAccessToken = $repoAccessToken;
         return $this;

@@ -5,8 +5,8 @@ use Poirot\OAuth2\Model\RefreshToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityUser;
-use Poirot\OAuth2\Interfaces\Server\Repository\iRepoRefreshToken;
-use Poirot\OAuth2\Interfaces\Server\Repository\iRepoUser;
+use Poirot\OAuth2\Interfaces\Server\Repository\iRepoRefreshTokens;
+use Poirot\OAuth2\Interfaces\Server\Repository\iRepoUsers;
 use Poirot\OAuth2\Server\Exception\exOAuthServer;
 use Poirot\OAuth2\Server\Response\aGrantResponseAccessToken;
 use Poirot\OAuth2\Server\Response\GrantResponseJson;
@@ -17,9 +17,9 @@ use Psr\Http\Message\ResponseInterface;
 class GrantPassword
     extends aGrant
 {
-    /** @var iRepoRefreshToken */
+    /** @var iRepoRefreshTokens */
     protected $repoRefreshToken;
-    /** @var iRepoUser */
+    /** @var iRepoUsers */
     protected $repoUser;
 
     /** @var \DateInterval */
@@ -162,13 +162,13 @@ class GrantPassword
     }
     
     
-    function setRepoUser(iRepoUser $repoUser)
+    function setRepoUser(iRepoUsers $repoUser)
     {
         $this->repoUser = $repoUser;
         return $this;
     }
 
-    function setRepoRefreshToken(iRepoRefreshToken $repoRefreshToken)
+    function setRepoRefreshToken(iRepoRefreshTokens $repoRefreshToken)
     {
         $this->repoRefreshToken = $repoRefreshToken;
         return $this;

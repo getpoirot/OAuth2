@@ -1,25 +1,25 @@
 <?php
 namespace Poirot\OAuth2\Interfaces\Server\Repository;
 
-interface iRepoRefreshToken
+interface iRepoAccessTokens
 {
     /**
      * Insert New Token
      *
-     * @param iEntityRefreshToken $token
+     * @param iEntityAccessToken $token
      *
      * @return iEntityAccessToken include insert id
      */
-    function insert(iEntityRefreshToken $token);
+    function insert(iEntityAccessToken $token);
 
     /**
      * Find Token Match By Identifier
      *
      * note: it must not gather tokens that expired by time
-     * 
+     *
      * @param string $tokenIdentifier
      * 
-     * @return iEntityRefreshToken|false
+     * @return iEntityAccessToken|false
      */
     function findByIdentifier($tokenIdentifier);
     

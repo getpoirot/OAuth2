@@ -4,12 +4,12 @@ namespace Poirot\OAuth2\Model\Repo\Stateless;
 use Poirot\OAuth2\Interfaces\iEncrypt;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
-use Poirot\OAuth2\Interfaces\Server\Repository\iRepoRefreshToken;
+use Poirot\OAuth2\Interfaces\Server\Repository\iRepoRefreshTokens;
 use Poirot\OAuth2\Model\RefreshToken;
 
 
 class RefreshTokens
-    implements iRepoRefreshToken
+    implements iRepoRefreshTokens
 {
     /** @var iEncrypt */
     protected $encryption;

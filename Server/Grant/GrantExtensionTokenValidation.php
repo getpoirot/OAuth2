@@ -3,10 +3,8 @@ namespace Poirot\OAuth2\Server\Grant;
 
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityClient;
 use Poirot\OAuth2\Model\AccessToken;
-use Poirot\OAuth2\Model\RefreshToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityUser;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoRefreshTokens;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoUsers;
 use Poirot\OAuth2\Server\Exception\exOAuthServer;
@@ -46,6 +44,9 @@ use Psr\Http\Message\ResponseInterface;
 class GrantExtensionTokenValidation
     extends aGrant
 {
+    const TYPE_GRANT = 'urn:poirot-framework.com:oauth2:grant_type:validate_bearer';
+
+
     /** @var iRepoRefreshTokens */
     protected $repoRefreshToken;
     /** @var iRepoUsers */
@@ -62,7 +63,7 @@ class GrantExtensionTokenValidation
      */
     function getGrantType()
     {
-        return 'urn:poirot-framework.com:oauth2:grant_type:validate_bearer';
+        return self::TYPE_GRANT;
     }
     
     /**

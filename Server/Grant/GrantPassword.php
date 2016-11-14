@@ -100,7 +100,7 @@ class GrantPassword
         if (is_null($username) || is_null($password))
             throw exOAuthServer::invalidRequest('"username" or "password"', null, $this->newGrantResponse());
 
-        $user = $this->repoUser->findByUserCredential($username, $password);
+        $user = $this->repoUser->findByUserPass($username, $password);
         if (!$user instanceof iEntityUser)
             throw exOAuthServer::invalidCredentials($this->newGrantResponse());
 

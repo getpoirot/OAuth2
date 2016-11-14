@@ -4,17 +4,17 @@ namespace Poirot\OAuth2\Interfaces\Server\Repository;
 interface iEntityUser
 {
     /**
-     * Unique User Identifier (username) 
+     * Unique User Identifier (username)
      *
      * @return string|int
      */
     function getIdentifier();
 
     /**
-     * Get Credential
-     * 
+     * Get Password Credential
+     *
      * @return string
      */
-    function getCredential();
+    function getPassword();
     
 }

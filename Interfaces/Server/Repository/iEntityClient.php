@@ -1,6 +1,23 @@
 <?php
 namespace Poirot\OAuth2\Interfaces\Server\Repository;
 
+/*
+{
+  "identifier": "57b96ddd3be2ba000f64d001",
+  "secret_key": "57b96ddd91fcc",
+  "name": "Anar-Android-App",
+  "description": "Anar Android Application.",
+  "image": "http://anarmidone.com/images/logo.png",
+  "client_type": "confidential",
+  "owner_identifier": null,
+  "scope": [
+    "general"
+  ],
+  "redirect_uri": "http://127.0.0.1/",
+  "resident_client": true
+}
+ */
+
 interface iEntityClient
 {
     /**

@@ -29,7 +29,7 @@ class exOAuthServer
         $this->httpResponseCode = $responseCode;
         $this->responder = $responder;
         
-        parent::__construct($dataError->getErrorDescription());
+        parent::__construct($dataError->getErrorDescription(), $responseCode);
     }
 
     /**

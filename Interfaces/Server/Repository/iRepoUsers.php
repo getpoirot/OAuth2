@@ -15,11 +15,13 @@ interface iRepoUsers
     /**
      * Find User By Combination Of Username/Password (identifier/credential)
      *
-     * @param string $identifier
+     * !! Method Mandatory to Implement "password" Grant
+     *
+     * @param string $userIdentifier
      * @param string $credential
      *
      * @return iEntityUser|false
      */
-    function findByUserCredential($identifier, $credential);
+    function findByUserPass($userIdentifier, $credential);
     
 }

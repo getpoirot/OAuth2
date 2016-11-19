@@ -241,7 +241,7 @@ class GrantAuthCode
         
         ## Issue and persist access + refresh tokens
 
-        $user = $this->repoUser->findByIdentifier($authCode->getOwnerIdentifier());
+        $user = $this->repoUser->findOneByIdentifier($authCode->getOwnerIdentifier());
         if (!$user instanceof iEntityUser)
             // Resource Owner Not Found!!
             throw exOAuthServer::invalidRequest('code', 'Authorization code has expired', $this->newGrantResponse());

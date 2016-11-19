@@ -10,7 +10,7 @@ interface iRepoUsers
      *
      * @return iEntityUser|false
      */
-    function findByIdentifier($identifier);
+    function findOneByIdentifier($identifier);
 
     /**
      * Find User By Combination Of Username/Password (identifier/credential)
@@ -22,6 +22,6 @@ interface iRepoUsers
      *
      * @return iEntityUser|false
      */
-    function findByUserPass($userIdentifier, $credential);
+    function findOneByUserPass($userIdentifier, $credential);
     
 }

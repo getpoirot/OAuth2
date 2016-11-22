@@ -6,22 +6,22 @@ interface iRepoUsers
     /**
      * Find User By Identifier (username)
      *
-     * @param string $identifier
+     * @param string $uid
      *
      * @return iEntityUser|false
      */
-    function findOneByIdentifier($identifier);
+    function findOneByUID($uid);
 
     /**
      * Find User By Combination Of Username/Password (identifier/credential)
      *
      * !! Method Mandatory to Implement "password" Grant
      *
-     * @param string $userIdentifier
+     * @param string $username
      * @param string $credential
      *
      * @return iEntityUser|false
      */
-    function findOneByUserPass($userIdentifier, $credential);
+    function findOneByUserPass($username, $credential);
     
 }

@@ -56,7 +56,7 @@ class GrantRefreshToken
         $this->repoRefreshToken->removeByIdentifier($oldRefreshToken->getIdentifier());
 
         # Issue New Tokens
-        $user          = $this->repoUser->findOneByIdentifier($oldRefreshToken->getOwnerIdentifier());
+        $user          = $this->repoUser->findOneByUID($oldRefreshToken->getOwnerIdentifier());
         if (!$user)
             throw exOAuthServer::invalidRefreshToken(null, $this->newGrantResponse());
         

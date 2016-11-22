@@ -73,7 +73,7 @@ class GrantImplicit
 
         // The user approved the client, redirect them back with an access token
         $user = $this->getUserEntity();
-        
+
         $reqParams = $request->getQueryParams();
         $redirect  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
         $redirect  = \Poirot\Std\emptyCoalesce( $redirect, current($client->getRedirectUri()) );
@@ -101,7 +101,7 @@ class GrantImplicit
     /**
      * New Grant Response
      * @return GrantResponseRedirect
-     * @throws exOAuthServer
+     * @throws \Exception|exOAuthServer
      */
     function newGrantResponse()
     {
@@ -109,8 +109,16 @@ class GrantImplicit
 
         $client    = $this->assertClient();
         $reqParams = $request->getQueryParams();
-        $redirectUri  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
-        $redirectUri  = \Poirot\Std\emptyCoalesce( $redirectUri, current($client->getRedirectUri()) );
+        $redirectUri  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri'], null);
+        if ($redirectUri === null) {
+            $redirectUri = $client->getRedirectUri();
+            if (is_array($redirectUri))
+                $redirectUri = current($redirectUri);
+            elseif (\Poirot\Std\isStringify($redirectUri))
+                $redirectUri = (string) $redirectUri;
+            else
+                throw new \Exception('Invalid Redirect Uri Provided by Client.');
+        }
 
         if ( $redirectUri !== null && ! in_array($redirectUri, $client->getRedirectUri()) ) {
             ## redirect-uri not match 
@@ -148,9 +156,8 @@ class GrantImplicit
 
     /**
      * User Entity
-     *
      * @return iEntityUser
-     * @throws \Exception
+     * @throws \Exception|exOAuthServer
      */
     function getUserEntity()
     {
@@ -159,10 +166,7 @@ class GrantImplicit
 
         $user = call_user_func($this->retrieveUserCallback);
         if (!$user instanceof iEntityUser)
-            throw new \LogicException(sprintf(
-                'User Retrieve Callback Must Return iEntityUser Instance; given: (%s).'
-                , \Poirot\Std\flatten($user)
-            ));
+            throw exOAuthServer::accessDenied($this->newGrantResponse());
 
         return $user;
     }

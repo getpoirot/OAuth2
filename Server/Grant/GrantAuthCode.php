@@ -241,7 +241,7 @@ class GrantAuthCode
         
         ## Issue and persist access + refresh tokens
 
-        $user = $this->repoUser->findOneByIdentifier($authCode->getOwnerIdentifier());
+        $user = $this->repoUser->findOneByUID($authCode->getOwnerIdentifier());
         if (!$user instanceof iEntityUser)
             // Resource Owner Not Found!!
             throw exOAuthServer::invalidRequest('code', 'Authorization code has expired', $this->newGrantResponse());
@@ -282,8 +282,16 @@ class GrantAuthCode
         if ($this->_isAuthorizationRequest($request)) {
             $client    = $this->assertClient();
             $reqParams = $request->getQueryParams();
-            $redirectUri  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
-            $redirectUri  = \Poirot\Std\emptyCoalesce( $redirectUri, current($client->getRedirectUri()) );
+            $redirectUri  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri'], null);
+            if ($redirectUri === null) {
+                $redirectUri = $client->getRedirectUri();
+                if (is_array($redirectUri))
+                    $redirectUri = current($redirectUri);
+                elseif (\Poirot\Std\isStringify($redirectUri))
+                    $redirectUri = (string) $redirectUri;
+                else
+                    throw new \Exception('Invalid Redirect Uri Provided by Client.');
+            }
 
             if ( $redirectUri !== null && ! in_array($redirectUri, $client->getRedirectUri()) ) {
                 ## redirect-uri not match 
@@ -327,7 +335,7 @@ class GrantAuthCode
             ->setScopes($scopes)
             ->setClientIdentifier($client->getIdentifier())
             ->setExpiryDateTime($curTime->add($authCodeTTL))
-            ->setOwnerIdentifier($resourceOwner->getIdentifier())
+            ->setOwnerIdentifier($resourceOwner->getUID())
             ->setRedirectUri($redirectUri)
         ;
 
@@ -456,10 +464,7 @@ class GrantAuthCode
 
         $user = call_user_func($this->retrieveUserCallback);
         if (!$user instanceof iEntityUser)
-            throw new \LogicException(sprintf(
-                'User Retrieve Callback Must Return iEntityUser Instance; given: (%s).'
-                , \Poirot\Std\flatten($user)
-            ));
+            throw exOAuthServer::accessDenied($this->newGrantResponse());
 
         return $user;
     }

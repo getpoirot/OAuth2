@@ -143,12 +143,14 @@ class exOAuthServer
      * Invalid client error.
      *
      * @param aGrantResponse $responder
+     * @param string|null    $errorMessage
      *
      * @return static
      */
-    static function invalidClient(aGrantResponse $responder = null)
+    static function invalidClient(aGrantResponse $responder = null, $errorMessage = null)
     {
-        $errorMessage = 'Client authentication failed';
+        if ($errorMessage === null)
+            $errorMessage = 'Client authentication failed';
 
         $err = new DataErrorResponse();
         $err->setError($err::ERR_INVALID_CLIENT);

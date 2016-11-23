@@ -188,7 +188,7 @@ class GrantExtensionTokenValidation
             // or Check Other Security Consideration ...
 
         } catch (\Exception $e) {
-            throw exOAuthServer::invalidClient($this->newGrantResponse());
+            throw exOAuthServer::invalidClient($this->newGrantResponse(), 'Only Resident Clients Allowed.');
         }
     }
 }

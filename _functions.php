@@ -77,8 +77,10 @@ namespace Poirot\OAuth2
         $uri .= (strstr($uri, $queryDelimiter) === false) ? $queryDelimiter : '&';
 
         $paramsJoined = array();
-        foreach($params as $param => $value)
+        foreach($params as $param => $value) {
+            $value = urlencode($value);
             $paramsJoined[] = "$param=$value";
+        }
         $query = implode('&', $paramsJoined);
         
         // url encoded data break tokens structure, then url encoding will happen outside if needed. 

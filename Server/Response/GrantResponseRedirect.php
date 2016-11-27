@@ -5,8 +5,6 @@ use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 
 use Psr\Http\Message\ResponseInterface;
 
-// TODO maybe url encoding needed as setter method or something to build redirect uri
-
 class GrantResponseRedirect
     extends aGrantResponseAccessToken
 {

@@ -34,6 +34,7 @@ class RefreshTokens
      */
     function insert(iEntityRefreshToken $token)
     {
+        // TODO RefreshToken Stateless Repo with serializable refresh token to map fields
         $tokenData = array(
             ## this identifier give back when unserialize token
             #- it can be the used as id on other persistence

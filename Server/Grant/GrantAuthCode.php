@@ -358,7 +358,7 @@ class GrantAuthCode
     {
         // refresh token have same data as access token
         $curTime = new \DateTime();
-        $token   = new RefreshToken();
+        $token   = new RefreshToken;
         $token
             ->setAccessTokenIdentifier($accessToken->getIdentifier())
             ->setClientIdentifier($accessToken->getClientIdentifier())

@@ -121,7 +121,7 @@ class GrantExtensionTokenValidation
 
         # Issue Access Token
 
-        $accToken = new AccessToken();
+        $accToken = new AccessToken;
         $accToken
             ->setIdentifier(json_encode($AccessToken))
             ->setClientIdentifier($ClientId)

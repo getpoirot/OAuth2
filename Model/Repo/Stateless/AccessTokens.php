@@ -33,6 +33,7 @@ class AccessTokens
      */
     function insert(iEntityAccessToken $token)
     {
+        // TODO AccessToken Stateless Repo with serializable access token to map fields
         $tokenData = array(
             ## this identifier give back when unserialize token
             #- it can be the used as id on other persistence
@@ -49,6 +50,7 @@ class AccessTokens
 
         $newToken = new AccessToken($tokenData);
         $newToken->setIdentifier($identifier);
+
         return $newToken;
     }
 

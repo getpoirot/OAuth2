@@ -208,7 +208,7 @@ abstract class aGrant
         , $scopes = array()
     ) {
         $curTime = new \DateTime();
-        $token   = new AccessToken();
+        $token   = new AccessToken;
         $token
             ->setScopes($scopes)
             ->setClientIdentifier($client->getIdentifier())

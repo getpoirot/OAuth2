@@ -69,7 +69,24 @@ class AuthorizeByRemoteServer
         $result = array_merge($result, $extra);
         unset($result['access_token']);
 
-        $token  = new AccessToken($result);
+        /*
+         * [
+         *    [scope] => general
+         *    [token_type] => Bearer
+         *    [expires_in] => 3251
+         *    [client_id] => 57b96ddd3be2ba000f64d001
+         *    [resource_owner] => 58344249e1682
+         * ]
+         */
+
+        $token  = new AccessToken;
+        $token
+            ->setExpiryDateTime( new \DateTime(__(new \DateTime())->getTimestamp()+$result['expires_in']) )
+            ->setClientIdentifier($result['client_id'])
+            ->setOwnerIdentifier($result['resource_owner'])
+            ->setScopes(explode(' ', $result['scope']))
+        ;
+
         return $token;
     }
 

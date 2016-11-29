@@ -79,9 +79,12 @@ class AuthorizeByRemoteServer
          * ]
          */
 
-        $token  = new AccessToken;
+        $exprDateTime = __( new \DateTime() )
+            ->add( new \DateInterval(sprintf('PT%sS', $result['expires_in'])) );
+
+        $token = new AccessToken;
         $token
-            ->setExpiryDateTime( new \DateTime(__(new \DateTime())->getTimestamp()+$result['expires_in']) )
+            ->setExpiryDateTime($exprDateTime)
             ->setClientIdentifier($result['client_id'])
             ->setOwnerIdentifier($result['resource_owner'])
             ->setScopes(explode(' ', $result['scope']))

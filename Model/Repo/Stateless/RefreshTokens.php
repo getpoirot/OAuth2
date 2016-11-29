@@ -5,7 +5,6 @@ use Poirot\OAuth2\Interfaces\iEncrypt;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoRefreshTokens;
-use Poirot\OAuth2\Model\RefreshToken;
 
 
 class RefreshTokens
@@ -34,25 +33,24 @@ class RefreshTokens
      */
     function insert(iEntityRefreshToken $token)
     {
-        // TODO RefreshToken Stateless Repo with serializable refresh token to map fields
-        $tokenData = array(
-            ## this identifier give back when unserialize token
+        $persistToken = new RefreshToken;
+        $persistToken
+            ## this identifier give back when token unserialized
             #- it can be the used as id on other persistence
-            'identifier'              => $token->getIdentifier(), 
-            'access_token_identifier' => $token->getAccessTokenIdentifier(),
-            'client_identifier'       => $token->getClientIdentifier(),
-            'expiry_date_time'        => $token->getExpiryDateTime(),
-            'scopes'                  => $token->getScopes(),
-            'owner_identifier'        => $token->getOwnerIdentifier(),
-        );
+            ->setIdentifier($token->getIdentifier())
+            ->setClientIdentifier($token->getClientIdentifier())
+            ->setExpiryDateTime($token->getExpiryDateTime())
+            ->setScopes($token->getScopes())
+            ->setOwnerIdentifier($token->getOwnerIdentifier())
+            ->setAccessTokenIdentifier($token->getAccessTokenIdentifier())
+        ;
 
         // Identifier will give back to user as token
-        $identifier = serialize($tokenData);
+        $identifier = serialize($persistToken);
         $identifier = $this->encryption->encrypt($identifier);
 
-        $newToken = new RefreshToken($tokenData);
-        $newToken->setIdentifier($identifier);
-        return $newToken;
+        $persistToken->setIdentifier($identifier);
+        return $persistToken;
     }
 
     /**
@@ -67,11 +65,11 @@ class RefreshTokens
      */
     function findByIdentifier($tokenIdentifier)
     {
-        $tokenData = $this->encryption->decrypt($tokenIdentifier);
-        if (false === $tokenData = @unserialize($tokenData))
+        $tokenEncrypted = $this->encryption->decrypt($tokenIdentifier);
+        if (false === $token = @unserialize($tokenEncrypted))
             throw new \Exception('Error Retrieve Refresh Token; Parse Error!!!');
 
-        $token = new RefreshToken($tokenData);
+        /** @var RefreshToken $token */
 
         # check expire time
         if (\Poirot\OAuth2\checkExpiry($token->getExpiryDateTime()))

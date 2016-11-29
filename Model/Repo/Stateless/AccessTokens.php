@@ -4,7 +4,7 @@ namespace Poirot\OAuth2\Model\Repo\Stateless;
 use Poirot\OAuth2\Interfaces\iEncrypt;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAccessTokens;
-use Poirot\OAuth2\Model\AccessToken;
+use Poirot\OAuth2\Model\Repo\Stateless\AccessToken;
 
 
 class AccessTokens
@@ -33,25 +33,23 @@ class AccessTokens
      */
     function insert(iEntityAccessToken $token)
     {
-        // TODO AccessToken Stateless Repo with serializable access token to map fields
-        $tokenData = array(
-            ## this identifier give back when unserialize token
+        $persistToken = new AccessToken;
+        $persistToken
+            ## this identifier give back when token unserialized
             #- it can be the used as id on other persistence
-            'identifier'              => $token->getIdentifier(),
-            'client_identifier'       => $token->getClientIdentifier(),
-            'expiry_date_time'        => $token->getExpiryDateTime(),
-            'scopes'                  => $token->getScopes(),
-            'owner_identifier'        => $token->getOwnerIdentifier(),
-        );
+            ->setIdentifier($token->getIdentifier())
+            ->setClientIdentifier($token->getClientIdentifier())
+            ->setExpiryDateTime($token->getExpiryDateTime())
+            ->setScopes($token->getScopes())
+            ->setOwnerIdentifier($token->getOwnerIdentifier())
+        ;
 
         // Identifier will give back to user as token
-        $identifier = serialize($tokenData);
+        $identifier = serialize($persistToken);
         $identifier = $this->encryption->encrypt($identifier);
 
-        $newToken = new AccessToken($tokenData);
-        $newToken->setIdentifier($identifier);
-
-        return $newToken;
+        $persistToken->setIdentifier($identifier);
+        return $persistToken;
     }
 
     /**
@@ -61,15 +59,17 @@ class AccessTokens
      *
      * @param string $tokenIdentifier
      *
-     * @return iEntityAccessToken|false
+     * @return false|iEntityAccessToken
+     * @throws \Exception
      */
     function findByIdentifier($tokenIdentifier)
     {
-        $tokenData = $this->encryption->decrypt($tokenIdentifier);
-        $tokenData = unserialize($tokenData);
+        $tokenEncrypted = $this->encryption->decrypt($tokenIdentifier);
+        if (false === $token = @unserialize($tokenEncrypted))
+            throw new \Exception('Error Retrieve Access Token; Parse Error!!!');
 
-        $token = new AccessToken($tokenData);
-        
+        /** @var AccessToken $token */
+
         # check expire time 
         if (\Poirot\OAuth2\checkExpiry($token->getExpiryDateTime()))
             return false;

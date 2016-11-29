@@ -207,12 +207,12 @@ abstract class aGrant
         , iEntityUser $resourceOwner = null
         , $scopes = array()
     ) {
-        $curTime = new \DateTime();
-        $token   = new AccessToken;
+        $exprDateTime = __( new \DateTime())->add($accessTokenTTL);
+        $token = new AccessToken;
         $token
             ->setScopes($scopes)
             ->setClientIdentifier($client->getIdentifier())
-            ->setExpiryDateTime($curTime->add($accessTokenTTL))
+            ->setExpiryDateTime($exprDateTime)
         ;
 
         if ($resourceOwner) $token->setOwnerIdentifier($resourceOwner->getUID());

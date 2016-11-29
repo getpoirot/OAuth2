@@ -147,11 +147,11 @@ abstract class aGrant
      * 
      * ! requested scope must equal or narrow to client/refreshToken pre-registered scopes
      * 
-     * @param array                  $preScopes iClientEntity->getScopes(), ...
+     * @param array                  $defaultScopes iClientEntity->getScopes(), ...
      * 
      * @return array [ scopeRequested => string[], scopeGranted => string[] ]
      */
-    function assertScopes(array $preScopes)
+    function assertScopes(array $defaultScopes)
     {
         if ($this->_c_assert_scopes)
             return $this->_c_assert_scopes;
@@ -169,20 +169,25 @@ abstract class aGrant
             $scopes = explode(' ' /* Scope Delimiter */, trim($scopes));
         else
             $scopes = array();
-        
+
         if (empty($scopes)) {
-            $scopes = $preScopes;
+            $scopes       = $defaultScopes;
             $scopeGranted = $scopes;
         }
-        else
+        else {
             $scopeGranted = array_filter(
                 $scopes
-                , function ($scope) use ($preScopes) {
+                , function ($scope) use ($defaultScopes) {
                 // Scopes Not Pre-Registered To Client Will Excluded!!
-                // (!) we must back scope to client if it differ 
-                return in_array($scope, $preScopes);
+                // (!) we must back scope to client if it differ
+                return in_array($scope, $defaultScopes);
             });
-        
+
+            if (empty($scopeGranted))
+                // Invalid Scopes
+                throw exOAuthServer::invalidRequest('scope', null, $this->newGrantResponse());
+        }
+
         return $this->_c_assert_scopes = array(
               'scopeRequested' => $scopes
             , 'scopeGranted' => $scopeGranted

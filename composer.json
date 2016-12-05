@@ -8,6 +8,6 @@
         }
     ]
     , "require": {
-        "poirot/psr7-http": "dev-master"
+        "poirot/psr7-http": "dev-devel"
     }
 }

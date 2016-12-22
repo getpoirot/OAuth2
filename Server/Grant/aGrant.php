@@ -138,7 +138,8 @@ abstract class aGrant
             $redirectUri = rtrim($redirectUri, '/');
             $match = false;
             foreach ($client->getRedirectUri() as $registeredRedirect) {
-                if ($redirectUri == rtrim($registeredRedirect, '/')) {
+                $registeredRedirect = rtrim($registeredRedirect, '/');
+                if ($redirectUri == $registeredRedirect) {
                     $match = true;
                     break;
                 }
@@ -148,7 +149,7 @@ abstract class aGrant
                 ## redirect-uri not match
                 throw exOAuthServer::invalidClient($this->newGrantResponse());
         }
-        
+
         return $client;
     }
 

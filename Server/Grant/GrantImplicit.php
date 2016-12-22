@@ -120,12 +120,25 @@ class GrantImplicit
                 throw new \Exception('Invalid Redirect Uri Provided by Client.');
         }
 
-        if ( $redirectUri !== null && ! in_array($redirectUri, $client->getRedirectUri()) ) {
-            ## redirect-uri not match 
-            // So we must not redirect back the error result to client 
-            // responder as an argument are abandoned!!
-            throw exOAuthServer::invalidClient();
+        // TODO what about assert clients??
+        if ($redirectUri !== null) {
+            $redirectUri = rtrim($redirectUri, '/');
+            $match = false;
+            foreach ($client->getRedirectUri() as $registeredRedirect) {
+                $registeredRedirect = rtrim($registeredRedirect, '/');
+                if ($redirectUri == $registeredRedirect) {
+                    $match = true;
+                    break;
+                }
+            }
+
+            if ( !$match )
+                ## redirect-uri not match
+                // So we must not redirect back the error result to client
+                // responder as an argument are abandoned!!
+                throw exOAuthServer::invalidClient($this->newGrantResponse());
         }
+
 
         $grantRespose = new GrantResponseRedirect();
         $grantRespose->setRedirectUri($redirectUri);

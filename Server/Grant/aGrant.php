@@ -134,11 +134,21 @@ abstract class aGrant
 
         $reqParams         = (array) $request->getParsedBody();
         $redirectUri       = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri'], $redirectUri);
-        if ( $redirectUri !== null && ! in_array($redirectUri, $client->getRedirectUri()) ) {
-            ## redirect-uri not match
-            throw exOAuthServer::invalidClient($this->newGrantResponse());
-        }
+        if ($redirectUri !== null) {
+            $redirectUri = rtrim($redirectUri, '/');
+            $match = false;
+            foreach ($client->getRedirectUri() as $registeredRedirect) {
+                if ($redirectUri == rtrim($registeredRedirect, '/')) {
+                    $match = true;
+                    break;
+                }
+            }
 
+            if ( !$match )
+                ## redirect-uri not match
+                throw exOAuthServer::invalidClient($this->newGrantResponse());
+        }
+        
         return $client;
     }
 

@@ -136,7 +136,7 @@ class GrantImplicit
                 ## redirect-uri not match
                 // So we must not redirect back the error result to client
                 // responder as an argument are abandoned!!
-                throw exOAuthServer::invalidClient($this->newGrantResponse());
+                throw exOAuthServer::invalidClient();
         }
 
 

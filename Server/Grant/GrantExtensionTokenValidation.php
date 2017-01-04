@@ -114,7 +114,7 @@ class GrantExtensionTokenValidation
         }
 
 
-        $ExpireIn = $token->getExpiryDateTime();
+        $ExpireIn = $token->getDateTimeExpiration();
         $Scope    = $token->getScopes();
         (!$token->isIssuedToResourceOwner()) ?: $AccessToken['resource_owner'] = $token->getOwnerIdentifier();
 
@@ -125,7 +125,7 @@ class GrantExtensionTokenValidation
         $accToken
             ->setIdentifier(json_encode($AccessToken))
             ->setClientIdentifier($ClientId)
-            ->setExpiryDateTime($ExpireIn)
+            ->setDateTimeExpiration($ExpireIn)
         ;
 
         $grantResponse = $this->newGrantResponse();

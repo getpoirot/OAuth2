@@ -228,7 +228,7 @@ abstract class aGrant
         $token
             ->setScopes($scopes)
             ->setClientIdentifier($client->getIdentifier())
-            ->setExpiryDateTime($exprDateTime)
+            ->setDateTimeExpiration($exprDateTime)
         ;
 
         if ($resourceOwner) $token->setOwnerIdentifier($resourceOwner->getUID());

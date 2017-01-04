@@ -26,7 +26,7 @@ interface iEntityAccessToken
      *
      * @return \DateTime
      */
-    function getExpiryDateTime();
+    function getDateTimeExpiration();
 
     /**
      * Return an array of scopes associated with the token

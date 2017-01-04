@@ -29,7 +29,7 @@ interface iRepoRefreshTokens
      * 
      * @param string $tokenIdentifier
      * 
-     * @return void
+     * @return int
      */
     function removeByIdentifier($tokenIdentifier);
     

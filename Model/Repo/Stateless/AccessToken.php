@@ -57,7 +57,7 @@ class AccessToken extends BaseAccessToken
         $this
             ->setIdentifier($props->identifier)
             ->setClientIdentifier($props->client_identifier)
-            ->setExpiryDateTime($exprDateTime)
+            ->setDateTimeExpiration($exprDateTime)
             ->setScopes($props->scopes)
             ->setOwnerIdentifier($props->owner_identifier)
         ;

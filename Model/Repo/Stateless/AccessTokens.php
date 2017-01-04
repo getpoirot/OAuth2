@@ -38,7 +38,7 @@ class AccessTokens
             #- it can be the used as id on other persistence
             ->setIdentifier($token->getIdentifier())
             ->setClientIdentifier($token->getClientIdentifier())
-            ->setExpiryDateTime($token->getExpiryDateTime())
+            ->setDateTimeExpiration($token->getDateTimeExpiration())
             ->setScopes($token->getScopes())
             ->setOwnerIdentifier($token->getOwnerIdentifier())
         ;
@@ -70,7 +70,7 @@ class AccessTokens
         /** @var AccessToken $token */
 
         # check expire time 
-        if (\Poirot\OAuth2\checkExpiry($token->getExpiryDateTime()))
+        if (\Poirot\OAuth2\checkExpiry($token->getDateTimeExpiration()))
             return false;
         
         $token->setIdentifier($tokenIdentifier); // replace identifier to stateless one

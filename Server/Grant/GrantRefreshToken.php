@@ -116,7 +116,7 @@ class GrantRefreshToken
         if ($refreshToken->getClientIdentifier() !== $client->getIdentifier())
             throw exOAuthServer::invalidRefreshToken(null, $this->newGrantResponse());
 
-        if ($refreshToken->getExpiryDateTime()->getTimestamp() < time())
+        if ($refreshToken->getDateTimeExpiration()->getTimestamp() < time())
             throw exOAuthServer::invalidRefreshToken('Refresh Token Is Expired', $this->newGrantResponse());
 
         return $refreshToken;
@@ -140,7 +140,7 @@ class GrantRefreshToken
             ->setClientIdentifier($accessToken->getClientIdentifier())
             ->setScopes($accessToken->getScopes())
             ->setOwnerIdentifier($accessToken->getOwnerIdentifier())
-            ->setExpiryDateTime($curTime->add($refreshTokenTTL))
+            ->setDateTimeExpiration($curTime->add($refreshTokenTTL))
         ;
 
         $iToken = $this->repoRefreshToken->insert($token);

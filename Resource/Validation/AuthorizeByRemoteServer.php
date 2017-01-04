@@ -84,7 +84,7 @@ class AuthorizeByRemoteServer
 
         $token = new AccessToken;
         $token
-            ->setExpiryDateTime($exprDateTime)
+            ->setDateTimeExpiration($exprDateTime)
             ->setClientIdentifier($result['client_id'])
             ->setOwnerIdentifier($result['resource_owner'])
             ->setScopes(explode(' ', $result['scope']))

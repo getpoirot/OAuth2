@@ -125,9 +125,9 @@ class GrantPassword
             ->setClientIdentifier($accessToken->getClientIdentifier())
             ->setScopes($accessToken->getScopes())
             ->setOwnerIdentifier($accessToken->getOwnerIdentifier())
-            ->setExpiryDateTime($curTime->add($refreshTokenTTL))
+            ->setDateTimeExpiration($curTime->add($refreshTokenTTL))
         ;
-        
+
         $iToken = $this->repoRefreshToken->insert($token);
         return $iToken;
     }

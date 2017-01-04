@@ -28,7 +28,7 @@ class GrantResponseJson
 
             $currDateTime   = new \DateTime();
             $currDateTime   = $currDateTime->getTimestamp();
-            $expireDateTime = $AccessToken->getExpiryDateTime()->getTimestamp();
+            $expireDateTime = $AccessToken->getDateTimeExpiration()->getTimestamp();
 
             $tokenParams = array(
                 'token_type'   => 'Bearer',

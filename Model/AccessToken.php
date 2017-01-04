@@ -83,7 +83,7 @@ class AccessToken
      *
      * @return \DateTime
      */
-    function getExpiryDateTime()
+    function getDateTimeExpiration()
     {
         return $this->expiryDateTime;
     }
@@ -95,7 +95,7 @@ class AccessToken
      * 
      * @return $this
      */
-    function setExpiryDateTime(\DateTime $expiryDateTime)
+    function setDateTimeExpiration(\DateTime $expiryDateTime)
     {
         $this->expiryDateTime = $expiryDateTime;
         return $this;

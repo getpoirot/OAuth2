@@ -120,7 +120,9 @@ abstract class aGrant
         }
 
         if (!$client instanceof iEntityClient)
-            throw exOAuthServer::invalidClient($this->newGrantResponse());
+            // So we must not redirect back the error result to client
+            // responder as an argument are abandoned!!
+            throw exOAuthServer::invalidClient();
 
         $this->_c_assert_client = $client;
 

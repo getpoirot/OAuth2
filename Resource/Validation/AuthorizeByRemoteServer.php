@@ -55,13 +55,16 @@ class AuthorizeByRemoteServer
 
         # Extract Result Data:
         if (! $result = json_decode($result))
-            throw exOAuthServer::serverError('Unexpected Result From Authorization Server.');
+            throw new \RuntimeException(sprintf(
+                'Unexpected Result From Authorization Server; giveback: "%s".'
+                , \Poirot\Std\flatten($result)
+            ));
 
         if (isset($result->error))
             throw exOAuthServer::serverError($result->error.': '.$result->error_description);
 
         if (!$extra  = json_decode($result->access_token))
-            throw exOAuthServer::serverError('Mismatch Token Response Structure Data; cant parse extra.');
+            throw new \RuntimeException('Mismatch Token Response Structure Data; cant parse extra.');
 
         $result = \Poirot\Std\toArrayObject($result);
         $extra  = \Poirot\Std\toArrayObject($extra);
@@ -104,7 +107,7 @@ class AuthorizeByRemoteServer
         # Connect To Remote Server and Retrieve Token Request Result as Extension:
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, $this->endpointToken);
+        curl_setopt($ch, CURLOPT_URL, trim($this->endpointToken));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS
             , http_build_query(array(
@@ -124,7 +127,11 @@ class AuthorizeByRemoteServer
 
         $result = curl_exec ($ch);
         if ($err = curl_error($ch))
-            throw exOAuthServer::serverError('Error while connecting to Authorization Server.');
+            throw new \RuntimeException(sprintf(
+                'Error while connecting to Authorization Server at (%s); error: "%s".'
+                , $this->endpointToken
+                , $err
+            ));
 
         curl_close ($ch);
 

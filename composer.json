@@ -16,7 +16,8 @@
             , "Module\\OAuth2Client\\": "mod/"
         }
         , "files": [
-            "src/_functions.php"
+            "mod/_ioc-facade.php"
+            ,"src/_functions.php"
         ]
     }
 }

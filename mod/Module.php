@@ -2,6 +2,7 @@
 namespace Module\OAuth2Client;
 
 use Poirot\Application\Interfaces\Sapi;
+use Poirot\Application\Sapi\Module\ContainerForFeatureActions;
 use Poirot\Ioc\Container;
 use Poirot\Ioc\Container\BuildContainer;
 use Poirot\Std\Interfaces\Struct\iDataEntity;
@@ -9,6 +10,7 @@ use Poirot\Std\Interfaces\Struct\iDataEntity;
 
 class Module implements Sapi\iSapiModule
     , Sapi\Module\Feature\iFeatureModuleMergeConfig
+    , Sapi\Module\Feature\iFeatureModuleNestActions
     , Sapi\Module\Feature\iFeatureModuleNestServices
 {
     const CONF_KEY = 'module.oauth2client';
@@ -29,6 +31,20 @@ class Module implements Sapi\iSapiModule
     function initConfig(iDataEntity $config)
     {
         return \Poirot\Config\load(__DIR__ . '/../../config/mod-oauth2client');
+    }
+
+    /**
+     * Get Action Services
+     *
+     * priority not that serious
+     *
+     * - return Array used to Build ModuleActionsContainer
+     *
+     * @return array|ContainerForFeatureActions|BuildContainer|\Traversable
+     */
+    function getActions()
+    {
+        return \Poirot\Config\load(__DIR__ . '/../../config/mod-oauth2client.actions');
     }
 
     /**

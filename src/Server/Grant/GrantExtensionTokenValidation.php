@@ -104,13 +104,13 @@ class GrantExtensionTokenValidation
             $token = $this->repoAccessToken->findByIdentifier($pToken);
             if (!$token instanceof iEntityAccessToken)
                 // Token is Revoked!!
-                throw exOAuthServer::invalidRequest(null, 'Token is Revoked',  $this->newGrantResponse());
+                throw exOAuthServer::invalidGrant('Token is Revoked',  $this->newGrantResponse());
         }
         else if ($pRefreshToken) {
             $token = $this->repoRefreshToken->findByIdentifier($pRefreshToken);
             if (!$token instanceof iEntityRefreshToken)
                 // Token is Revoked!!
-                throw exOAuthServer::invalidRefreshToken('Refresh Token is Revoked', $this->newGrantResponse());
+                throw exOAuthServer::invalidGrant('Refresh Token is Revoked', $this->newGrantResponse());
         }
 
 

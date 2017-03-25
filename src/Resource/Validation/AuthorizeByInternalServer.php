@@ -1,11 +1,10 @@
 <?php
 namespace Poirot\OAuth2\Resource\Validation;
 
-
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAccessTokens;
 use Poirot\OAuth2\Server\Exception\exOAuthServer;
-use Psr\Http\Message\ServerRequestInterface;
+
 
 class AuthorizeByInternalServer
     extends aAuthorizeToken
@@ -29,15 +28,14 @@ class AuthorizeByInternalServer
      *
      * note: implement grant extension http request
      *
-     * @param ServerRequestInterface $request
+     * @param string $token
      *
      * @return iEntityAccessToken
-     * @throws exOAuthServer
+     * @throws exOAuthServer Access Denied
      */
-    function hasValidated(ServerRequestInterface $request)
+    function assertToken($token)
     {
-        $token = $this->assertAccessToken($request);
-        if (false === $token = $this->_accessTokens->findByIdentifier($token))
+        if (false === $token = $this->_accessTokens->findByIdentifier((string) $token))
             throw exOAuthServer::accessDenied();
 
         return $token;

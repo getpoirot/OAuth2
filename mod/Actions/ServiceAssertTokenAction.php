@@ -6,9 +6,10 @@ use Poirot\Application\aSapi;
 use Poirot\Http\Interfaces\iHttpRequest;
 use Poirot\Http\Psr\ServerRequestBridgeInPsr;
 use Poirot\Ioc\Container\Service\aServiceContainer;
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Model\AccessToken;
+use Poirot\OAuth2\Resource\Validation\aAuthorizeToken;
 use Poirot\OAuth2\Server\Exception\exOAuthServer;
+use Poirot\OAuth2\Server\Response\Error\DataErrorResponse;
 use Poirot\Std\Struct\DataEntity;
 
 
@@ -60,29 +61,35 @@ class ServiceAssertTokenAction
          *
          * @param iHttpRequest $request
          *
-         * @return iEntityAccessToken
+         * @return \Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken[]
+         * @throws exOAuthServer
          */
         return function (iHttpRequest $request) use ($token)
         {
             if ($token)
                 // Debug Mode, Token is Mocked!!
-                return $token;
+                return ['token' => $token];
 
 
             # Retrieve Token Assertion From OAuth Resource Server
+            /** @var aAuthorizeToken $validator */
             $validator  = IOC::AuthorizeToken();
 
+            $token = $validator->parseTokenFromRequest( new ServerRequestBridgeInPsr($request) );
+
             try {
-                $token = $validator->hasValidated( new ServerRequestBridgeInPsr($request) );
-
-                // TODO check scope
-
+                $token = $validator->assertToken($token);
             } catch (exOAuthServer $e) {
                 // any oauth server error will set token result to false
-                $token = false;
+                if ($e->getError()->getError() !== DataErrorResponse::ERR_INVALID_GRANT)
+                    // Something other than token invalid or expire happen;
+                    // its not accessDenied exception
+                    throw $e;
+
+                $token = null;
             }
 
-            return $token;
+            return ['token' => $token];
         };
     }
 

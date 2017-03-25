@@ -5,7 +5,6 @@ use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Model\AccessToken;
 use Poirot\OAuth2\Server\Exception\exOAuthServer;
 use Poirot\OAuth2\Server\Grant\GrantExtensionTokenValidation;
-use Psr\Http\Message\ServerRequestInterface;
 
 
 /**
@@ -42,14 +41,13 @@ class AuthorizeByRemoteServer
      *
      * note: implement grant extension http request
      *
-     * @param ServerRequestInterface $request
+     * @param string $token
      *
      * @return iEntityAccessToken
      * @throws exOAuthServer
      */
-    function hasValidated(ServerRequestInterface $request)
+    function assertToken($token)
     {
-        $token  = $this->assertAccessToken($request);
         $result = $this->_sendByCurl($token);
 
 
@@ -60,8 +58,12 @@ class AuthorizeByRemoteServer
                 , \Poirot\Std\flatten($result)
             ));
 
-        if (isset($result->error))
+        if (isset($result->error)) {
+            if ($result->error == 'invalid_grant')
+                throw exOAuthServer::accessDenied();
+
             throw exOAuthServer::serverError($result->error.': '.$result->error_description);
+        }
 
         if (!$extra  = json_decode($result->access_token))
             throw new \RuntimeException('Mismatch Token Response Structure Data; cant parse extra.');

@@ -3,7 +3,6 @@ namespace Poirot\OAuth2\Resource\Validation;
 
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Server\Exception\exOAuthServer;
-use Poirot\OAuth2\Server\Response\Error\DataErrorResponse;
 use Psr\Http\Message\ServerRequestInterface;
 
 
@@ -18,12 +17,12 @@ abstract class aAuthorizeToken
      *
      * note: implement grant extension http request
      *
-     * @param ServerRequestInterface $request
+     * @param string $token
      *
      * @return iEntityAccessToken
-     * @throws exOAuthServer
+     * @throws exOAuthServer Access Denied
      */
-    abstract function hasValidated(ServerRequestInterface $request);
+    abstract function assertToken($token);
 
     /**
      * As per the Bearer spec (draft 8, section 2) - there are three ways for a client
@@ -32,17 +31,17 @@ abstract class aAuthorizeToken
      *
      * @param ServerRequestInterface $request
      *
-     * @return string Token
+     * @return null|string Token
      * @throws exOAuthServer
      */
-    function assertAccessToken(ServerRequestInterface $request)
+    function parseTokenFromRequest(ServerRequestInterface $request)
     {
         $token = null;
 
         # Get Token From Header:
         if ($header = $request->getHeaderLine('Authorization')) {
             if (!preg_match('/Bearer\s(\S+)/', $header, $matches))
-                throw exOAuthServer::invalidRequest(null, 'Malformed auth header');
+                throw exOAuthServer::invalidRequest(null, 'Malformed auth Bearer header.');
 
             return $token = $matches[1];
         }
@@ -67,16 +66,6 @@ abstract class aAuthorizeToken
         # Get Token From GET:
         $queryData = $request->getQueryParams();
         $token     = (isset($queryData['access_token'])) ? $queryData['access_token'] : null;
-
-        if (!$token)
-            /**
-             * If no authentication is provided, set the status code
-             * to 401 and return no other error information
-             *
-             * @see http://tools.ietf.org/html/rfc6750#section-3.1
-             */
-            throw new exOAuthServer(new DataErrorResponse, 401);
-
         return $token;
     }
 }

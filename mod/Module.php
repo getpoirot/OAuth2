@@ -30,7 +30,7 @@ class Module implements Sapi\iSapiModule
      */
     function initConfig(iDataEntity $config)
     {
-        return \Poirot\Config\load(__DIR__ . '/../../config/mod-oauth2client');
+        return \Poirot\Config\load(__DIR__ . '/config/mod-oauth2client');
     }
 
     /**
@@ -44,7 +44,7 @@ class Module implements Sapi\iSapiModule
      */
     function getActions()
     {
-        return \Poirot\Config\load(__DIR__ . '/../../config/mod-oauth2client.actions');
+        return \Poirot\Config\load(__DIR__ . '/config/mod-oauth2client.actions');
     }
 
     /**
@@ -61,7 +61,7 @@ class Module implements Sapi\iSapiModule
      */
     function getServices(Container $moduleContainer = null)
     {
-        $conf = \Poirot\Config\load(__DIR__ . '/../../config/mod-oauth2client.services');
+        $conf = \Poirot\Config\load(__DIR__ . '/config/mod-oauth2client.services');
         return $conf;
     }
 }

@@ -5,6 +5,8 @@ namespace Module\OAuth2Client\Actions
 
 
     /**
+     * @property callable $AssertToken
+     *
      * @method static callable AssertToken(iHttpRequest $request)
      */
     class IOC extends \IOC

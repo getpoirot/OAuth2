@@ -9,7 +9,7 @@
  * @see \Module\OAuth2Client::getServices()
  */
 return [
-    'implementation' => [
+    'implementations' => [
         // Service named "AuthorizeToken" Must Implement this Abstraction
         'authorizeToken' => Poirot\OAuth2\Resource\Validation\aAuthorizeToken::class,
     ],

@@ -12,11 +12,12 @@
     }
     , "target-dir": "Poirot/OAuth2"
     , "autoload"  : {
-        "psr-0": {
-            "Poirot\\OAuth2": "."
+        "psr-4": {
+            "Poirot\\OAuth2\\": "src/"
+            , "Module\\OAuth2Client\\": "mod/"
         }
         , "files": [
-            "_functions.php"
+            "src/_functions.php"
         ]
     }
 }

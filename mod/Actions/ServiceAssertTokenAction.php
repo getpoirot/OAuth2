@@ -54,6 +54,7 @@ class ServiceAssertTokenAction
                 ->setScopes($token['scopes'])
             ;
 
+            $token = $accToken;
         }
 
         /**

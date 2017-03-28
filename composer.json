@@ -17,7 +17,8 @@
         }
         , "files": [
             "mod/_ioc-facade.php"
-            ,"src/_functions.php"
+           ,"mod/_functions.php"
+           ,"src/_functions.php"
         ]
     }
 }

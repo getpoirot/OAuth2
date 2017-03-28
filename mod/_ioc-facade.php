@@ -8,7 +8,6 @@ namespace Module\OAuth2Client\Actions
      * @property ServiceAssertTokenAction $AssertToken
      *
      * @method static array AssertToken(iHttpRequest $request)
-     * @method static null  functorValidateGivenToken(\stdClass $tokenCondition = null)
      */
     class IOC extends \IOC
     { }

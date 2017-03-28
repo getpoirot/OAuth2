@@ -9,6 +9,5 @@ return array(
     'services' => array(
         // assertToken(iHttpRequest $request)
         \Module\OAuth2Client\Actions\ServiceAssertTokenAction::class,
-        'functorValidateGivenToken' => \Module\OAuth2Client\Actions\functorValidateGivenToken::class,
     ),
 );

@@ -4,6 +4,12 @@ namespace Module\OAuth2Client
     use Poirot\Application\Exception\exAccessDenied;
     use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 
+    /**
+     * @param iEntityAccessToken|null $token
+     * @param $tokenCondition
+     *
+     * @throws exAccessDenied
+     */
     function validateGivenToken(iEntityAccessToken $token = null, $tokenCondition)
     {
         if (!$token instanceof iEntityAccessToken)

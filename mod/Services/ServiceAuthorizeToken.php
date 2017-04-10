@@ -11,9 +11,6 @@ class ServiceAuthorizeToken
 {
     const CONF_KEY = 'ServiceAuthorizeToken';
 
-    protected $endPoint;
-    protected $authHeader;
-
 
     /**
      * Create Service
@@ -23,6 +20,7 @@ class ServiceAuthorizeToken
     function newService()
     {
         $conf = $this->_attainConf();
+        // TODO if service is string, then retrieve it from registered services
         return $conf['service'];
     }
 

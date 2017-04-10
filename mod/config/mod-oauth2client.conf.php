@@ -24,6 +24,7 @@ return [
                 \Poirot\Ioc\INST => new \Poirot\Ioc\instance(
                     \Poirot\OAuth2\Resource\Validation\AuthorizeByRemoteServer::class
                     , [
+                        // TODO options => []
                         'oauthTokenEndpoint'  => 'http://oauth_web-server/oauth/auth/token',
                         // Basic base64(clientId:clientSecret)
                         'authorizationHeader' => 'Basic dGVzdEBkZWZhdWx0LmF4R0VjZVZDdEdxWkFkVzNyYzM0c3FidlRBU1NUWnhEOnhQV0lwbXpCSzM4TW1EUmQ=',

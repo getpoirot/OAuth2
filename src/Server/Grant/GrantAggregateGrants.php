@@ -3,14 +3,11 @@ namespace Poirot\OAuth2\Server\Grant;
 
 use Poirot\OAuth2\Interfaces\Server\iGrant;
 use Poirot\OAuth2\Server\Exception\exOAuthServer;
-use Poirot\Std\ConfigurableSetter;
-use Poirot\Std\Interfaces\Pact\ipConfigurable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 
 class GrantAggregateGrants
-    extends ConfigurableSetter
     implements iGrant
 {
     /** @var iGrant[] */
@@ -29,12 +26,13 @@ class GrantAggregateGrants
     /**
      * Construct
      *
-     * @param array|\Traversable $options
+     * @param \Poirot\OAuth2\Interfaces\Server\iGrant[] $attachGrants
      */
-    function __construct($options = null)
+    function __construct(array $attachGrants = null)
     {
-        $this->putBuildPriority( array('attached_grants',) );
-        return parent::__construct($options);
+        if ($attachGrants !== null)
+            $this->setAttachedGrants($attachGrants);
+
     }
 
 
@@ -67,21 +65,6 @@ class GrantAggregateGrants
     function canRespondToRequest(ServerRequestInterface $request)
     {
         foreach ($this->attached_grants as $index => $grant) {
-            if ($grant instanceof ipConfigurable) {
-                ## Override Grant Options From Config
-                $options = (isset($this->atached_grants_options['default']))
-                    ? $this->atached_grants_options['default']
-                    : array();
-
-                if (isset($this->atached_grants_options[$index])) {
-                    $options = array_merge($options, $this->atached_grants_options[$index]);
-                    unset($this->atached_grants_options[$index]);
-                }
-
-                // don't throw exception if options not match
-                $grant->with($options, false);
-            }
-
             if ($grant = $grant->canRespondToRequest($request)) {
                 $this->grantResponder = $grant;
                 return $grant;
@@ -129,19 +112,6 @@ class GrantAggregateGrants
     function attachGrant(iGrant $grant)
     {
         $this->attached_grants[get_class($grant)] = $grant;
-        return $this;
-    }
-
-    /**
-     * Set Options Override For Grants
-     *
-     * @param array $options
-     *
-     * @return $this
-     */
-    function setOptionsOverride($options)
-    {
-        $this->atached_grants_options = $options;
         return $this;
     }
 }

@@ -15,7 +15,17 @@ class AccessToken
     protected $scopes = array();
     protected $ownerIdentifier;
 
-    
+
+    /**
+     * Token Identifier
+     *
+     * @return string
+     */
+    function __toString()
+    {
+        return (string) $this->getIdentifier();
+    }
+
     /**
      * Unique Token Identifier
      *

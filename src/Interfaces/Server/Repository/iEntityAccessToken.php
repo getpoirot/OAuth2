@@ -48,4 +48,11 @@ interface iEntityAccessToken
      * @return boolean
      */
     function isIssuedToResourceOwner();
+
+    /**
+     * Token Identifier
+     * 
+     * @return string
+     */
+    function __toString();
 }

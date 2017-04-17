@@ -6,7 +6,7 @@ use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAccessTokens;
 
 
-class AccessTokens
+class AccessTokenRepo
     implements iRepoAccessTokens
 {
     /** @var iEncrypt */

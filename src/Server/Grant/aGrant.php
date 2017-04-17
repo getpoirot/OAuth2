@@ -2,9 +2,9 @@
 namespace Poirot\OAuth2\Server\Grant;
 
 use Poirot\OAuth2\Interfaces\Server\iGrant;
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityClient;
+use Poirot\OAuth2\Interfaces\Server\Repository\iOAuthClient;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityUser;
+use Poirot\OAuth2\Interfaces\Server\Repository\iOAuthUser;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoClients;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAccessTokens;
 use Poirot\OAuth2\Model\AccessToken;
@@ -97,7 +97,7 @@ abstract class aGrant
      *
      * @param bool $validateSecretKey Client is confidential
      * 
-     * @return iEntityClient
+     * @return iOAuthClient
      * @throws exOAuthServer
      */
     function assertClient($validateSecretKey = true)
@@ -119,7 +119,7 @@ abstract class aGrant
             throw exOAuthServer::serverError('Server Client Database has rise an error.', $this->newGrantResponse());
         }
 
-        if (!$client instanceof iEntityClient)
+        if (!$client instanceof iOAuthClient)
             // So we must not redirect back the error result to client
             // responder as an argument are abandoned!!
             throw exOAuthServer::invalidClient();
@@ -213,16 +213,16 @@ abstract class aGrant
     /**
      * Issue Token and Persist It
      * 
-     * @param iEntityClient $client
+     * @param iOAuthClient $client
      * @param \DateInterval $accessTokenTTL
      * @param array         $scopes
-     * @param iEntityUser   $resourceOwner
+     * @param iOAuthUser   $resourceOwner
      * 
      * @return iEntityAccessToken
      */
-    protected function issueAccessToken(iEntityClient $client
+    protected function issueAccessToken(iOAuthClient $client
         , \DateInterval $accessTokenTTL
-        , iEntityUser $resourceOwner = null
+        , iOAuthUser $resourceOwner = null
         , $scopes = array()
     ) {
         $exprDateTime = __( new \DateTime())->add($accessTokenTTL);

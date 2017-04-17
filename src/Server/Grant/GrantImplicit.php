@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\OAuth2\Server\Grant;
 
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityUser;
+use Poirot\OAuth2\Interfaces\Server\Repository\iOAuthUser;
 use Poirot\OAuth2\Server\Exception\exOAuthServer;
 use Poirot\OAuth2\Server\Response\GrantResponseRedirect;
 
@@ -169,7 +169,7 @@ class GrantImplicit
 
     /**
      * User Entity
-     * @return iEntityUser
+     * @return iOAuthUser
      * @throws \Exception|exOAuthServer
      */
     function getUserEntity()
@@ -178,7 +178,7 @@ class GrantImplicit
             throw new \Exception('User Retrieve Callback Not Set.');
 
         $user = call_user_func($this->retrieveUserCallback);
-        if (!$user instanceof iEntityUser)
+        if (!$user instanceof iOAuthUser)
             throw exOAuthServer::accessDenied($this->newGrantResponse());
 
         return $user;

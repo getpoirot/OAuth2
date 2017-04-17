@@ -3,7 +3,7 @@ namespace Poirot\OAuth2\Server\Grant;
 
 use Poirot\OAuth2\Model\RefreshToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityClient;
+use Poirot\OAuth2\Interfaces\Server\Repository\iOAuthClient;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoRefreshTokens;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoUsers;
@@ -93,12 +93,12 @@ class GrantRefreshToken
     // ...
 
     /**
-     * @param iEntityClient $client
+     * @param iOAuthClient $client
      *
      * @return iEntityRefreshToken
      * @throws exOAuthServer
      */
-    protected function assertRefreshToken(iEntityClient $client)
+    protected function assertRefreshToken(iOAuthClient $client)
     {
         $request = $this->request;
         

@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\OAuth2\Server\Grant;
 
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityClient;
+use Poirot\OAuth2\Interfaces\Server\Repository\iOAuthClient;
 use Poirot\OAuth2\Model\AccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
@@ -172,7 +172,7 @@ class GrantExtensionTokenValidation
     /**
      * Validate Client Authorization For Grant Type
      *
-     * @param iEntityClient $client
+     * @param iOAuthClient $client
      *
      * @throws exOAuthServer
      */

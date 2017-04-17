@@ -6,19 +6,19 @@ interface iRepoClients
     /**
      * Insert New Client
      *
-     * @param iEntityClient $client
+     * @param iOAuthClient $client
      *
-     * @return iEntityClient include insert id
+     * @return iOAuthClient include insert id
      * @throws \Exception
      */
-    function insert(iEntityClient $client);
+    function insert(iOAuthClient $client);
 
     /**
      * Find Client By Identifier
      * 
      * @param string|int $clientID
      *
-     * @return iEntityClient|false
+     * @return iOAuthClient|false
      */
     function findByIdentifier($clientID);
 
@@ -32,7 +32,7 @@ interface iRepoClients
      * @param string|int $clientID
      * @param string     $secretKey
      *
-     * @return iEntityClient|false
+     * @return iOAuthClient|false
      */
     function findByIDSecretKey($clientID, $secretKey);
 }

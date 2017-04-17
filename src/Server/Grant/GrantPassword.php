@@ -4,7 +4,7 @@ namespace Poirot\OAuth2\Server\Grant;
 use Poirot\OAuth2\Model\RefreshToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityUser;
+use Poirot\OAuth2\Interfaces\Server\Repository\iOAuthUser;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoRefreshTokens;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoUsers;
 use Poirot\OAuth2\Server\Exception\exOAuthServer;
@@ -86,7 +86,7 @@ class GrantPassword
     /**
      * Attain User by Request
      *
-     * @return iEntityUser
+     * @return iOAuthUser
      * @throws exOAuthServer
      */
     protected function assertUser()
@@ -101,7 +101,7 @@ class GrantPassword
             throw exOAuthServer::invalidRequest('"username" or "password"', null, $this->newGrantResponse());
 
         $user = $this->repoUser->findOneByUserPass($username, $password);
-        if (!$user instanceof iEntityUser)
+        if (!$user instanceof iOAuthUser)
             throw exOAuthServer::invalidCredentials($this->newGrantResponse());
 
         return $user;

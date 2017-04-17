@@ -8,7 +8,7 @@ interface iRepoUsers
      *
      * @param string $uid
      *
-     * @return iEntityUser|false
+     * @return iOAuthUser|false
      */
     function findOneByUID($uid);
 
@@ -20,7 +20,7 @@ interface iRepoUsers
      * @param string $username
      * @param string $credential
      *
-     * @return iEntityUser|false
+     * @return iOAuthUser|false
      */
     function findOneByUserPass($username, $credential);
     

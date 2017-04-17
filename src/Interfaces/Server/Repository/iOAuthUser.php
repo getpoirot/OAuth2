@@ -1,14 +1,14 @@
 <?php
 namespace Poirot\OAuth2\Interfaces\Server\Repository;
 
-interface iEntityUser
+interface iOAuthUser
 {
     /**
      * Unique User Identifier
      *
      * !! Identifier Must Be Unique
      *
-     * @return string|int
+     * @return mixed
      */
     function getUID();
 

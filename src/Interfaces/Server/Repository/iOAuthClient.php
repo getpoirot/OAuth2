@@ -18,7 +18,7 @@ namespace Poirot\OAuth2\Interfaces\Server\Repository;
 }
  */
 
-interface iEntityClient
+interface iOAuthClient
 {
     /**
      * Unique ClientID

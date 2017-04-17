@@ -3,9 +3,9 @@ namespace Poirot\OAuth2\Server\Grant;
 
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAuthCode;
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityClient;
+use Poirot\OAuth2\Interfaces\Server\Repository\iOAuthClient;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityRefreshToken;
-use Poirot\OAuth2\Interfaces\Server\Repository\iEntityUser;
+use Poirot\OAuth2\Interfaces\Server\Repository\iOAuthUser;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoAuthCodes;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoRefreshTokens;
 use Poirot\OAuth2\Interfaces\Server\Repository\iRepoUsers;
@@ -242,7 +242,7 @@ class GrantAuthCode
         ## Issue and persist access + refresh tokens
 
         $user = $this->repoUser->findOneByUID($authCode->getOwnerIdentifier());
-        if (!$user instanceof iEntityUser)
+        if (!$user instanceof iOAuthUser)
             // Resource Owner Not Found!!
             throw exOAuthServer::invalidRequest('code', 'Authorization code has expired', $this->newGrantResponse());
         
@@ -323,9 +323,9 @@ class GrantAuthCode
     /**
      * Issue Token and Persist It
      *
-     * @param iEntityClient $client
+     * @param iOAuthClient $client
      * @param \DateInterval $authCodeTTL
-     * @param iEntityUser   $resourceOwner
+     * @param iOAuthUser   $resourceOwner
      * @param string        $redirectUri
      * @param string        $codeChallenge
      * @param string        $codeChallengeMethod
@@ -333,9 +333,9 @@ class GrantAuthCode
      * 
      * @return iEntityAccessToken
      */
-    protected function issueAuthCode(iEntityClient $client
+    protected function issueAuthCode(iOAuthClient $client
         , \DateInterval $authCodeTTL
-        , iEntityUser $resourceOwner
+        , iOAuthUser $resourceOwner
         , $redirectUri
         , $scopes = array()
         , $codeChallenge = null
@@ -466,7 +466,7 @@ class GrantAuthCode
     /**
      * User Entity
      *
-     * @return iEntityUser
+     * @return iOAuthUser
      * @throws \Exception
      */
     function getUserEntity()
@@ -475,7 +475,7 @@ class GrantAuthCode
             throw new \Exception('User Retrieve Callback Not Set.');
 
         $user = call_user_func($this->retrieveUserCallback);
-        if (!$user instanceof iEntityUser)
+        if (!$user instanceof iOAuthUser)
             throw exOAuthServer::accessDenied($this->newGrantResponse());
 
         return $user;

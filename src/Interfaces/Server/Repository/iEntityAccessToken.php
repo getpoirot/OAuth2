@@ -51,7 +51,7 @@ interface iEntityAccessToken
 
     /**
      * Token Identifier
-     * 
+     *
      * @return string
      */
     function __toString();

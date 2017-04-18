@@ -10,7 +10,7 @@ interface iOAuthUser
      *
      * @return mixed
      */
-    function getUID();
+    function getUid();
 
 
     // To Implement Basic Grants

@@ -35,7 +35,7 @@ class AccessToken
     {
         if (!$this->identifier)
             // generate token if it not provided!
-            $this->setIdentifier(\Poirot\OAuth2\generateUniqueIdentifier());
+            $this->setIdentifier(\Poirot\Std\generateUniqueIdentifier());
         
         return $this->identifier;
     }

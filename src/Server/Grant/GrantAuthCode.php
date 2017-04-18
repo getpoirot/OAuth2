@@ -347,7 +347,7 @@ class GrantAuthCode
             ->setScopes($scopes)
             ->setClientIdentifier($client->getIdentifier())
             ->setExpiryDateTime($curTime->add($authCodeTTL))
-            ->setOwnerIdentifier($resourceOwner->getUID())
+            ->setOwnerIdentifier($resourceOwner->getUid())
             ->setRedirectUri($redirectUri)
         ;
 

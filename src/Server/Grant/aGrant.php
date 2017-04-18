@@ -233,7 +233,7 @@ abstract class aGrant
             ->setDateTimeExpiration($exprDateTime)
         ;
 
-        if ($resourceOwner) $token->setOwnerIdentifier($resourceOwner->getUID());
+        if ($resourceOwner) $token->setOwnerIdentifier($resourceOwner->getUid());
 
         $iToken = $this->repoAccessToken->insert($token);
         return $iToken;

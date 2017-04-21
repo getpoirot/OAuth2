@@ -184,12 +184,6 @@ class AccessToken
      */
     function setOwnerIdentifier($ownerIdentifier)
     {
-        if ($ownerIdentifier !== null && ! (is_int($ownerIdentifier) || is_string($ownerIdentifier)) )
-            throw new \InvalidArgumentException(sprintf(
-                'Identifier must be int or string; given: (%s).'
-                , \Poirot\Std\flatten($ownerIdentifier)
-            ));
-
         $this->ownerIdentifier = $ownerIdentifier;
         return $this;
     }

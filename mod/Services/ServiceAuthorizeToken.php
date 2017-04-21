@@ -16,12 +16,25 @@ class ServiceAuthorizeToken
      * Create Service
      *
      * @return mixed
+     * @throws \Exception
      */
     function newService()
     {
-        $conf = $this->_attainConf();
-        // TODO if service is string, then retrieve it from registered services
-        return $conf['service'];
+        $conf    = $this->_attainConf();
+        $service = $conf['service'];
+        if (is_string($service)) {
+            // Looking For Registered Service
+            if (!$this->services()->has($service))
+                throw new \Exception(sprintf(
+                    'Try to retrieve SmsClient Service From (%s) but not found.'
+                    , $service
+                ));
+
+            $service = $this->services()->get($service);
+        }
+
+
+        return $service;
     }
 
 

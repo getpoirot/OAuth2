@@ -5,16 +5,42 @@ use Poirot\Application\Interfaces\Sapi;
 use Poirot\Application\Sapi\Module\ContainerForFeatureActions;
 use Poirot\Ioc\Container;
 use Poirot\Ioc\Container\BuildContainer;
+use Poirot\Loader\Autoloader\LoaderAutoloadAggregate;
+use Poirot\Loader\Autoloader\LoaderAutoloadNamespace;
+use Poirot\Loader\Interfaces\iLoaderAutoload;
 use Poirot\Std\Interfaces\Struct\iDataEntity;
 
 
 class Module implements Sapi\iSapiModule
+    , Sapi\Module\Feature\iFeatureModuleAutoload
     , Sapi\Module\Feature\iFeatureModuleMergeConfig
     , Sapi\Module\Feature\iFeatureModuleNestActions
     , Sapi\Module\Feature\iFeatureModuleNestServices
 {
     const CONF_KEY = 'module.oauth2client';
 
+
+    /**
+     * Register class autoload on Autoload
+     *
+     * priority: 1000 B
+     *
+     * @param LoaderAutoloadAggregate $baseAutoloader
+     *
+     * @return iLoaderAutoload|array|\Traversable|void
+     */
+    function initAutoload(LoaderAutoloadAggregate $baseAutoloader)
+    {
+        #$nameSpaceLoader = \Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class;
+        $nameSpaceLoader = 'Poirot\Loader\Autoloader\LoaderAutoloadNamespace';
+        /** @var LoaderAutoloadNamespace $nameSpaceLoader */
+        $nameSpaceLoader = $baseAutoloader->loader($nameSpaceLoader);
+        $nameSpaceLoader->addResource(__NAMESPACE__, __DIR__);
+
+
+        require_once __DIR__.'/_functions.php';
+        require_once __DIR__.'/_ioc-facade.php';
+    }
 
     /**
      * Register config key/value

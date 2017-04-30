@@ -20,16 +20,14 @@ return [
 
         // Service Used By AssertToken To Authorize Given Request
         \Module\OAuth2Client\Services\ServiceAuthorizeToken::CONF_KEY => [
-            'service' => [
-                \Poirot\Ioc\INST => new \Poirot\Ioc\instance(
-                    \Poirot\OAuth2\Resource\Validation\AuthorizeByRemoteServer::class
-                    , [
-                        'oauthTokenEndpoint'  => 'http://oauth_web-server/oauth/auth/token',
-                        // Basic base64(clientId:clientSecret)
-                        'authorizationHeader' => 'Basic dGVzdEBkZWZhdWx0LmF4R0VjZVZDdEdxWkFkVzNyYzM0c3FidlRBU1NUWnhEOnhQV0lwbXpCSzM4TW1EUmQ=',
-                    ]
-                ),
-            ],
+            'service' => new \Poirot\Ioc\instance(
+                \Poirot\OAuth2\Resource\Validation\AuthorizeByRemoteServer::class
+                , [
+                    'oauthTokenEndpoint'  => 'http://oauth_web-server/oauth/auth/token',
+                    // Basic base64(clientId:clientSecret)
+                    'authorizationHeader' => 'Basic dGVzdEBkZWZhdWx0LmF4R0VjZVZDdEdxWkFkVzNyYzM0c3FidlRBU1NUWnhEOnhQV0lwbXpCSzM4TW1EUmQ=',
+                ]
+            ),
         ],
     ],
 ];

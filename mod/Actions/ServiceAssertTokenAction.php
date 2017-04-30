@@ -78,8 +78,11 @@ class ServiceAssertTokenAction
 
             $token = $validator->parseTokenFromRequest( new ServerRequestBridgeInPsr($request) );
 
-            try {
-                $token = $validator->assertToken($token);
+            try
+            {
+                if ($token)
+                    $token = $validator->assertToken($token);
+
             } catch (exOAuthServer $e) {
                 // any oauth server error will set token result to false
                 if ($e->getError()->getError() !== DataErrorResponse::ERR_INVALID_GRANT)

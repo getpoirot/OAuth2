@@ -13,7 +13,6 @@
     , "autoload"  : {
         "psr-4": {
             "Poirot\\OAuth2\\": "src/"
-            , "Module\\OAuth2Client\\": "mod/"
         }
         , "files": [
            "src/_functions.php"

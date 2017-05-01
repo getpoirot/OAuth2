@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\OAuth2\Interfaces\Server\Repository;
 
+
 interface iRepoAccessTokens
 {
     /**

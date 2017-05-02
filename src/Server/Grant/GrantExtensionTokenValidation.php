@@ -116,7 +116,7 @@ class GrantExtensionTokenValidation
 
         $ExpireIn = $token->getDateTimeExpiration();
         $Scope    = $token->getScopes();
-        (!$token->isIssuedToResourceOwner()) ?: $AccessToken['resource_owner'] = $token->getOwnerIdentifier();
+        (!$token->isIssuedToResourceOwner()) ?: $AccessToken['resource_owner'] = (string) $token->getOwnerIdentifier();
 
 
         # Issue Access Token

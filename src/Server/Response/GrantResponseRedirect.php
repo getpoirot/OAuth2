@@ -37,7 +37,7 @@ class GrantResponseRedirect
             $tokenParams = array(
                 'token_type'   => 'Bearer',
                 'expires_in'   => $expireDateTime - $currDateTime,
-                'access_token' => $AccessToken->getIdentifier(),
+                'access_token' => (string) $AccessToken->getIdentifier(),
             );
 
             $responseParams = array_merge($responseParams, $tokenParams);

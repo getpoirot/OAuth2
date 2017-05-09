@@ -49,6 +49,7 @@ class exOAuthServer
         
         $this->responder->import($this->dataError);
         $response = $this->responder->toResponseWith($response);
+        $response = $response->withStatus(400);
         return $response;
     }
     

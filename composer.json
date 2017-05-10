@@ -7,8 +7,8 @@
         }
     ]
     , "require": {
-        "poirot/psr7-http": "dev-devel"
-        , "poirot/std": "dev-devel"
+        "poirot/psr7-http": "dev-master"
+        , "poirot/std": "dev-master"
     }
     , "autoload"  : {
         "psr-4": {

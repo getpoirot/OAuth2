@@ -17,8 +17,9 @@ class AccessToken extends BaseAccessToken
      */
     function serialize()
     {
-        $props = \Poirot\Std\cast($this)->toArray();
-        return json_encode($props);
+        $props     = \Poirot\Std\cast($this)->toArray();
+        $serialize = json_encode($props);
+        return $serialize;
     }
 
     /**
@@ -50,8 +51,8 @@ class AccessToken extends BaseAccessToken
         $props = json_decode($serialized);
 
         $exprDateTime = new \DateTime(
-            $props->expiry_date_time->date
-            , new \DateTimeZone($props->expiry_date_time->timezone)
+            $props->date_time_expiration->date
+            , new \DateTimeZone($props->date_time_expiration->timezone)
         );
 
         $this

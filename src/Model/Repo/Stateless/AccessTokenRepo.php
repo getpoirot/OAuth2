@@ -40,7 +40,7 @@ class AccessTokenRepo
             ->setClientIdentifier($token->getClientIdentifier())
             ->setDateTimeExpiration($token->getDateTimeExpiration())
             ->setScopes($token->getScopes())
-            ->setOwnerIdentifier($token->getOwnerIdentifier())
+            ->setOwnerIdentifier( (string) $token->getOwnerIdentifier())
         ;
 
         // Identifier will give back to user as token

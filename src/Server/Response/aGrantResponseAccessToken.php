@@ -3,6 +3,7 @@ namespace Poirot\OAuth2\Server\Response;
 
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
 
+
 abstract class aGrantResponseAccessToken
     extends aGrantResponse
 {

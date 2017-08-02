@@ -17,6 +17,7 @@ class AccessToken extends BaseAccessToken
      */
     function serialize()
     {
+        $this->_c_reflection = null;
         $props     = \Poirot\Std\cast($this)->toArray();
         $serialize = json_encode($props);
         return $serialize;

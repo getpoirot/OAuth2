@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\OAuth2\Server\Grant;
 
+use Module\OAuth2\Model\Entity\UserEntity;
 use Poirot\OAuth2\Interfaces\Server\Repository\iOAuthClient;
 use Poirot\OAuth2\Model\AccessToken;
 use Poirot\OAuth2\Interfaces\Server\Repository\iEntityAccessToken;
@@ -116,7 +117,13 @@ class GrantExtensionTokenValidation
 
         $ExpireIn = $token->getDateTimeExpiration();
         $Scope    = $token->getScopes();
-        (!$token->isIssuedToResourceOwner()) ?: $AccessToken['resource_owner'] = (string) $token->getOwnerIdentifier();
+        if ($token->isIssuedToResourceOwner()) {
+            $AccessToken['resource_owner'] = $uid = (string) $token->getOwnerIdentifier();
+
+            /** @var UserEntity $user */
+            $user = $this->repoUser->findOneByUID($uid);
+            $AccessToken['meta'] = $user->getMeta();
+        }
 
 
         # Issue Access Token

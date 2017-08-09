@@ -121,7 +121,9 @@ class GrantExtensionTokenValidation
             $AccessToken['resource_owner'] = $uid = (string) $token->getOwnerIdentifier();
 
             /** @var UserEntity $user */
-            $user = $this->repoUser->findOneByUID($uid);
+            if ( false === $user = $this->repoUser->findOneByUID($uid) )
+                throw exOAuthServer::invalidGrant('User Not Found.',  $this->newGrantResponse());
+
             $AccessToken['meta'] = $user->getMeta();
         }
 

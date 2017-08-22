@@ -102,7 +102,7 @@ class GrantPassword
 
         $user = $this->repoUser->findOneByUserPass($username, $password);
         if (!$user instanceof iOAuthUser)
-            throw exOAuthServer::invalidCredentials($this->newGrantResponse());
+            throw exOAuthServer::accessDenied($this->newGrantResponse(), 401);
 
         return $user;
     }

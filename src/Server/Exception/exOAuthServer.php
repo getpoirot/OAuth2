@@ -49,7 +49,7 @@ class exOAuthServer
         
         $this->responder->import($this->dataError);
         $response = $this->responder->toResponseWith($response);
-        $response = $response->withStatus(400);
+        $response = $response->withStatus($this->httpResponseCode);
         return $response;
     }
     
@@ -227,7 +227,7 @@ class exOAuthServer
 
         return new static(
             $err
-            , 400
+            , 401
             , $responder
         );
     }
@@ -239,15 +239,15 @@ class exOAuthServer
      * 
      * @return static
      */
-    static function accessDenied(aGrantResponse $responder = null)
+    static function accessDenied(aGrantResponse $responder = null, $responseCode = 403)
     {
         $err = new DataErrorResponse();
-        $err->setError($err::ERR_INVALID_GRANT);
+        $err->setError($err::ERR_ACCESS_DENIED);
         $err->setErrorDescription('The resource owner or authorization server denied the request.');
 
         return new static(
             $err
-            , 400
+            , $responseCode
             , $responder
         );
     }

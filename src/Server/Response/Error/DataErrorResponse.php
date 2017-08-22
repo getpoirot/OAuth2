@@ -9,6 +9,7 @@ class DataErrorResponse
     const ERR_INVALID_REQUEST        = 'invalid_request';
     const ERR_INVALID_CLIENT         = 'invalid_client';
     const ERR_INVALID_GRANT          = 'invalid_grant';
+    const ERR_ACCESS_DENIED          = 'access_denied';
     const ERR_UNAUTHORIZED_CLIENT    = 'unauthorized_client';
     const ERR_UNSUPPORTED_GRANT_TYPE = 'unsupported_grant_type';
     const ERR_INVALID_SCOPE          = 'invalid_scope';

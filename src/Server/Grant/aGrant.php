@@ -66,7 +66,6 @@ abstract class aGrant
     function canRespondToRequest(ServerRequestInterface $request)
     {
         $requestParameters = (array) $request->getParsedBody();
-        
         $return = false;
         
         if (
@@ -157,12 +156,13 @@ abstract class aGrant
 
     /**
      * Assert Requested Scopes And Reduce Or Append Scope
-     * 
+     *
      * ! requested scope must equal or narrow to client/refreshToken pre-registered scopes
-     * 
-     * @param array                  $defaultScopes iClientEntity->getScopes(), ...
-     * 
+     *
+     * @param array $defaultScopes iClientEntity->getScopes(), ...
+     *
      * @return array [ scopeRequested => string[], scopeGranted => string[] ]
+     * @throws exOAuthServer
      */
     function assertScopes(array $defaultScopes)
     {

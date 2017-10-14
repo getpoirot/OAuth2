@@ -57,8 +57,11 @@ class GrantRefreshToken
 
         # Issue New Tokens
         $user          = $this->repoUser->findOneByUID($oldRefreshToken->getOwnerIdentifier());
-        if (!$user)
-            throw exOAuthServer::invalidRefreshToken(null, $this->newGrantResponse());
+        if (! $user )
+            throw exOAuthServer::invalidRefreshToken(sprintf(
+                'User (%s) is not found.', $oldRefreshToken->getOwnerIdentifier())
+                , $this->newGrantResponse()
+            );
         
         $accToken      = $this->issueAccessToken($client, $this->getTtlAccessToken(), $user, $scopes);
         $refToken      = $this->issueRefreshToken($accToken, $this->getTtlRefreshToken());

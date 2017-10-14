@@ -65,9 +65,13 @@ class RefreshTokens
      */
     function findByIdentifier($tokenIdentifier)
     {
-        $tokenEncrypted = $this->encryption->decrypt($tokenIdentifier);
-        if (false === $token = @unserialize($tokenEncrypted))
-            throw new \Exception('Error Retrieve Refresh Token; Parse Error!!!');
+        try {
+            $tokenEncrypted = $this->encryption->decrypt($tokenIdentifier);
+            if (false === $token = @unserialize($tokenEncrypted))
+                throw new \Exception('Error Retrieve Refresh Token; Parse Error!!!');
+        } catch (\Exception $e) {
+            return false;
+        }
 
         /** @var RefreshToken $token */
 

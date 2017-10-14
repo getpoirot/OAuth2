@@ -64,8 +64,13 @@ class AuthorizationCodes
      */
     function findByIdentifier($identifier)
     {
-        $tokenData = $this->encryption->decrypt($identifier);
-        $tokenData = unserialize($tokenData);
+        try {
+            $tokenData = $this->encryption->decrypt($identifier);
+            if (false === $tokenData = @unserialize($tokenData))
+                throw new \Exception('Error Retrieve Refresh Token; Parse Error!!!');
+        } catch (\Exception $e) {
+            return false;
+        }
 
         $token = new AuthCode($tokenData);
         $token->setIdentifier($identifier); // replace identifier to stateless one

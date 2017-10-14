@@ -50,8 +50,8 @@ class RefreshToken extends BaseRefreshToken
         $props = json_decode($serialized);
 
         $exprDateTime = new \DateTime(
-            $props->expiry_date_time->date
-            , new \DateTimeZone($props->expiry_date_time->timezone)
+            $props->date_time_expiration->date
+            , new \DateTimeZone($props->date_time_expiration->timezone)
         );
 
         $this

@@ -6,6 +6,7 @@ use Poirot\OAuth2\Server\Response\Error\DataErrorResponse;
 use Poirot\OAuth2\Server\Response\GrantResponseJson;
 use Psr\Http\Message\ResponseInterface;
 
+// TODO The Errors can be better at message and the reason
 class exOAuthServer 
     extends \Exception
 {

@@ -105,24 +105,28 @@ class GrantExtensionTokenValidation
             $token = $this->repoAccessToken->findByIdentifier($pToken);
             if (!$token instanceof iEntityAccessToken)
                 // Token is Revoked!!
-                throw exOAuthServer::invalidGrant('Token is Revoked',  $this->newGrantResponse());
+                throw exOAuthServer::invalidCredentials($this->newGrantResponse());
         }
         else if ($pRefreshToken) {
             $token = $this->repoRefreshToken->findByIdentifier($pRefreshToken);
             if (!$token instanceof iEntityRefreshToken)
                 // Token is Revoked!!
-                throw exOAuthServer::invalidGrant('Refresh Token is Revoked', $this->newGrantResponse());
+                throw exOAuthServer::invalidCredentials($this->newGrantResponse());
         }
 
 
         $ExpireIn = $token->getDateTimeExpiration();
         $Scope    = $token->getScopes();
+
         if ($token->isIssuedToResourceOwner()) {
             $AccessToken['resource_owner'] = $uid = (string) $token->getOwnerIdentifier();
 
             /** @var UserEntity $user */
-            if ( false === $user = $this->repoUser->findOneByUID($uid) )
-                throw exOAuthServer::invalidGrant('User Not Found.',  $this->newGrantResponse());
+            $user = $this->repoUser->findOneByUID($uid);
+
+            if ( false === $user )
+                // Maybe User Deleted Or Something
+                throw exOAuthServer::invalidCredentials($this->newGrantResponse());
 
             $AccessToken['meta'] = $user->getMeta();
         }

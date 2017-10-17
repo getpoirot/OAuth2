@@ -197,6 +197,7 @@ class AccessToken
     function isIssuedToResourceOwner()
     {
         $ownerIdentifier = $this->getOwnerIdentifier();
-        return (! empty($ownerIdentifier) ) || $ownerIdentifier == 0;
+        $flag = (empty($ownerIdentifier)) && ($ownerIdentifier !== 0 && $ownerIdentifier !== '0');
+        return !$flag;
     }
 }

@@ -118,6 +118,8 @@ class GrantExtensionTokenValidation
         $ExpireIn = $token->getDateTimeExpiration();
         $Scope    = $token->getScopes();
 
+
+        $AccessToken['meta'] = [];
         if ($token->isIssuedToResourceOwner()) {
             $AccessToken['resource_owner'] = $uid = (string) $token->getOwnerIdentifier();
 

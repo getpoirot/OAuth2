@@ -222,7 +222,7 @@ class exOAuthServer
     static function invalidRefreshToken($hint = null, aGrantResponse $responder = null)
     {
         $err = new DataErrorResponse();
-        $err->setError($err::ERR_INVALID_REQUEST);
+        $err->setError($err::ERR_INVALID_GRANT);
         $err->setErrorDescription('The refresh token is invalid.');
         $err->setHint($hint);
 

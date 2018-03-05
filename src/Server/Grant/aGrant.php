@@ -263,7 +263,7 @@ abstract class aGrant
     function getTtlAccessToken()
     {
         if (!$this->ttlAccessToken)
-            $this->setTtlAccessToken(new \DateInterval('PT1H'));
+            $this->setTtlAccessToken(new \DateInterval('P1Y'));
         
         return $this->ttlAccessToken;
     }

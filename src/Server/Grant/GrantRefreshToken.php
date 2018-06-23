@@ -106,7 +106,7 @@ class GrantRefreshToken
         $request = $this->request;
         
         $requestParameters      = (array) $request->getParsedBody();
-        $refreshTokenIdentifier = \Poirot\Std\emptyCoalesce(@$requestParameters['refresh_token']);
+        $refreshTokenIdentifier = $requestParameters['refresh_token'] ?? null;
         if (!$refreshTokenIdentifier)
             throw exOAuthServer::invalidRequest('refresh_token', null, $this->newGrantResponse());
 

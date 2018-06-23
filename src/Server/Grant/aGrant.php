@@ -131,10 +131,10 @@ abstract class aGrant
         // maybe redirect_uri find in request query params
         // used in authorization grants like implicit ..
         $reqParams         = $request->getQueryParams();
-        $redirectUri       = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
+        $redirectUri       = $reqParams['redirect_uri'] ?? null;
 
         $reqParams         = (array) $request->getParsedBody();
-        $redirectUri       = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri'], $redirectUri);
+        $redirectUri       = $reqParams['redirect_uri'] ?? $redirectUri;
         if ($redirectUri !== null) {
             $redirectUri = rtrim($redirectUri, '/');
             $match = false;
@@ -174,10 +174,10 @@ abstract class aGrant
         // maybe scope find in request query params
         // used in authorization grants like implicit ..
         $reqParams  = $request->getQueryParams();
-        $scopes     = \Poirot\Std\emptyCoalesce(@$reqParams['scope']);
+        $scopes     = $reqParams['scope'] ?? null;
         
         $reqParams = (array) $request->getParsedBody();
-        $scopes    = \Poirot\Std\emptyCoalesce(@$reqParams['scope'], $scopes);
+        $scopes    = $reqParams['scope'] ?? $scopes;
         if (!empty($scopes))
             $scopes = explode(' ' /* Scope Delimiter */, trim($scopes));
         else

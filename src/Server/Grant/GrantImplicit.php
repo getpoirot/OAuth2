@@ -40,8 +40,8 @@ class GrantImplicit
         $return = false;
 
         $requestParameters = $request->getQueryParams();
-        $responseType      = \Poirot\Std\emptyCoalesce(@$requestParameters['response_type']);
-        $clientIdentifier  = \Poirot\Std\emptyCoalesce(@$requestParameters['client_id']);
+        $responseType      = $requestParameters['response_type'] ?? null;
+        $clientIdentifier  = $requestParameters['client_id'] ?? null;
 
         if ($responseType === 'token' && $clientIdentifier !== null) {
             $return = clone $this;
@@ -75,9 +75,9 @@ class GrantImplicit
         $user = $this->getUserEntity();
 
         $reqParams = $request->getQueryParams();
-        $redirect  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
-        $redirect  = \Poirot\Std\emptyCoalesce( $redirect, current($client->getRedirectUri()) );
-        $state     = \Poirot\Std\emptyCoalesce(@$reqParams['state']);
+        $redirect  = $reqParams['redirect_uri'] ?? null;
+        $redirect  = $redirect ?? current($client->getRedirectUri());
+        $state     = $reqParams['state'] ?? null;
 
         $accToken  = $this->issueAccessToken($client, $this->getTtlAccessToken(), $user, $scopes);
 
@@ -109,7 +109,7 @@ class GrantImplicit
 
         $client    = $this->assertClient();
         $reqParams = $request->getQueryParams();
-        $redirectUri  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri'], null);
+        $redirectUri  = $reqParams['redirect_uri'] ?? null;
         if ($redirectUri === null) {
             $redirectUri = $client->getRedirectUri();
             if (is_array($redirectUri))

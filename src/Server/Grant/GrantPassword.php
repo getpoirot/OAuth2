@@ -94,8 +94,8 @@ class GrantPassword
         $request = $this->request;
 
         $requestParameters = (array) $request->getParsedBody();
-        $username = \Poirot\Std\emptyCoalesce(@$requestParameters['username']);
-        $password = \Poirot\Std\emptyCoalesce(@$requestParameters['password']);
+        $username = $requestParameters['username'] ?? null;
+        $password = $requestParameters['password'] ?? null;
         
         if (is_null($username) || is_null($password))
             throw exOAuthServer::invalidRequest('"username" or "password"', null, $this->newGrantResponse());

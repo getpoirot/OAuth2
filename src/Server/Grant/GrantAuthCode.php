@@ -74,8 +74,8 @@ class GrantAuthCode
     protected function _isAuthorizationRequest(ServerRequestInterface $request)
     {
         $requestParameters = $request->getQueryParams();
-        $responseType      = \Poirot\Std\emptyCoalesce(@$requestParameters['response_type']);
-        $clientIdentifier  = \Poirot\Std\emptyCoalesce(@$requestParameters['client_id']);
+        $responseType      = $requestParameters['response_type'] ?? null;
+        $clientIdentifier  = $requestParameters['client_id'] ?? null;
 
         return ($responseType === 'code' && $clientIdentifier !== null);
     }
@@ -126,17 +126,17 @@ class GrantAuthCode
         $user = $this->getUserEntity();
 
         $reqParams = $request->getQueryParams();
-        $redirect  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
-        $redirect  = \Poirot\Std\emptyCoalesce( $redirect, current($client->getRedirectUri()) );
-        $state     = \Poirot\Std\emptyCoalesce(@$reqParams['state']);
+        $redirect  = $reqParams['redirect_uri'] ?? null;
+        $redirect  = $redirect ?? current($client->getRedirectUri());
+        $state     = $reqParams['state'] ?? null;
 
         $codeChallenge = null; $codeChallengeMethod = null;
         if ($this->enableCodeExchangeProof) {
-            $codeChallenge = \Poirot\Std\emptyCoalesce(@$reqParams['code_challenge']);
+            $codeChallenge = $reqParams['code_challenge'] ?? null;
             if ($codeChallenge === null)
                 throw exOAuthServer::invalidRequest('code_challenge', null,  $this->newGrantResponse());
 
-            $codeChallengeMethod = \Poirot\Std\emptyCoalesce(@$reqParams['code_challenge_method'], 'plain');
+            $codeChallengeMethod = $reqParams['code_challenge_method'] ?? 'plain';
             if (!in_array($codeChallengeMethod, array('plain', 'S256')))
                 throw exOAuthServer::invalidRequest(
                     'code_challenge_method'
@@ -181,7 +181,7 @@ class GrantAuthCode
         $client = $this->assertClient(true);
 
         $reqParams = (array) $request->getParsedBody();
-        $authCodeIdentifier = \Poirot\Std\emptyCoalesce(@$reqParams['code']);
+        $authCodeIdentifier = $reqParams['code'] ?? null;
         if ($authCodeIdentifier === null)
             throw exOAuthServer::invalidRequest('code', null, $this->newGrantResponse());
 
@@ -199,7 +199,7 @@ class GrantAuthCode
             // Authorization code has expired
             throw exOAuthServer::invalidRequest('code', 'Authorization code has expired', $this->newGrantResponse());
 
-        $redirectUri = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri']);
+        $redirectUri = $reqParams['redirect_uri'] ?? null;
         if ($authCode->getRedirectUri() !== $redirectUri)
             // Invalid redirect URI
             throw exOAuthServer::invalidRequest('redirect_uri', null, $this->newGrantResponse());
@@ -211,7 +211,7 @@ class GrantAuthCode
         ## Validate code challenge
         
         if ($this->enableCodeExchangeProof === true) {
-            $codeVerifier = \Poirot\Std\emptyCoalesce(@$reqParams['code_verifier']);
+            $codeVerifier = $reqParams['code_verifier'] ?? null;
             if ($codeVerifier === null)
                 throw exOAuthServer::invalidRequest('code_verifier', null, $this->newGrantResponse());
 
@@ -282,7 +282,7 @@ class GrantAuthCode
         if ($this->_isAuthorizationRequest($request)) {
             $client    = $this->assertClient();
             $reqParams = $request->getQueryParams();
-            $redirectUri  = \Poirot\Std\emptyCoalesce(@$reqParams['redirect_uri'], null);
+            $redirectUri  = $reqParams['redirect_uri'] ?? null;
             if ($redirectUri === null) {
                 $redirectUri = $client->getRedirectUri();
                 if (is_array($redirectUri))

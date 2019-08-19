@@ -17,6 +17,8 @@ use Psr\Http\Message\ResponseInterface;
 class GrantRefreshToken
     extends aGrant
 {
+    const GrantType = 'refresh_token';
+
     /** @var iRepoRefreshTokens */
     protected $repoRefreshToken;
     /** @var iRepoUsers */
@@ -33,7 +35,7 @@ class GrantRefreshToken
      */
     function getGrantType()
     {
-        return 'refresh_token';
+        return self::GrantType;
     }
     
     /**

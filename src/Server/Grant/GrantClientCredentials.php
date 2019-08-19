@@ -14,9 +14,12 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=client_credentials
 */
 
-class GrantClientCredentials 
+class GrantClientCredentials
     extends aGrant
 {
+    const GrantType = 'client_credentials';
+    
+    
     /**
      * Grant identifier (client_credentials, password, ...)
      *
@@ -24,7 +27,7 @@ class GrantClientCredentials
      */
     function getGrantType()
     {
-        return 'client_credentials';
+        return self::GrantType;
     }
 
     /**

@@ -12,6 +12,8 @@ use Psr\Http\Message\ServerRequestInterface;
 class GrantImplicit
     extends aGrant
 {
+    const GrantType = 'implicit';
+
     /** @var callable */
     protected $retrieveUserCallback;
 
@@ -23,7 +25,7 @@ class GrantImplicit
      */
     function getGrantType()
     {
-        return 'implicit';
+        return self::GrantType;
     }
 
     /**

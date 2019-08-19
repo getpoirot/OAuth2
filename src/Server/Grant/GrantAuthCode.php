@@ -22,6 +22,8 @@ use Psr\Http\Message\ServerRequestInterface;
 class GrantAuthCode
     extends aGrant
 {
+    const GrantType = 'authorization_code';
+
     /** @var iRepoRefreshTokens */
     protected $repoRefreshToken;
     /** @var iRepoAuthCodes */
@@ -47,7 +49,7 @@ class GrantAuthCode
      */
     function getGrantType()
     {
-        return 'authorization_code';
+        return self::GrantType;
     }
 
     /**

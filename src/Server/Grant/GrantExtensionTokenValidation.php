@@ -20,7 +20,7 @@ use Psr\Http\Message\ResponseInterface;
  *
  * Request From Client Include Token:
  *
- *   POST http://authorization-server-host.com/path_to_auth/token HTTP/1.1
+ *   POST http://authorization-server-host.com/auth/token HTTP/1.1
  *   Content-Type: application/x-www-form-urlencoded
  *   Authorization: Basic cnNfY2xpZW50OnBhc3N3b3Jk
  *
@@ -39,14 +39,14 @@ use Psr\Http\Message\ResponseInterface;
  *     "scope":"<contains_token_scopes>",
  *     "client_id":"<token_client_id>"
  *   }
- *
  */
-
 class GrantExtensionTokenValidation
     extends aGrant
 {
-    const TYPE_GRANT = 'urn:poirot-framework.com:oauth2:grant_type:validate_bearer';
+    const GrantType = 'urn:poirot-framework.com:oauth2:grant_type:validate_bearer';
 
+    /** @var string|null */
+    protected $grantTypeCustom;
 
     /** @var iRepoRefreshTokens */
     protected $repoRefreshToken;
@@ -55,25 +55,18 @@ class GrantExtensionTokenValidation
 
     /** @var \DateInterval */
     protected $ttlRefreshToken;
-    
-    
+
+
     /**
-     * Grant identifier (client_credentials, password, ...)
-     *
-     * @return string
+     * @inheritDoc
      */
     function getGrantType()
     {
-        return self::TYPE_GRANT;
+        return self::GrantType;
     }
     
     /**
-     * Respond To Grant Request
-     *
-     * @param ResponseInterface $response
-     *
-     * @return ResponseInterface prepared response
-     * @throws exOAuthServer
+     * @inheritDoc
      */
     function respond(ResponseInterface $response)
     {
@@ -93,34 +86,31 @@ class GrantExtensionTokenValidation
 
 
         ## Retrieve Token Data
-        $ClientId    = $client->getIdentifier();
-        $AccessToken = array(
+        $Scope = null;
+        $ClientId = $client->getIdentifier();
+        $AccessToken = [
             // extra data represent as json
             'resource_owner' => null,
-        );
-        $Scope       = null;
-
+        ];
 
         if ($pToken) {
             $token = $this->repoAccessToken->findByIdentifier($pToken);
-            if (!$token instanceof iEntityAccessToken)
+            if (! $token instanceof iEntityAccessToken )
                 // Token is Revoked!!
                 throw exOAuthServer::invalidCredentials($this->newGrantResponse());
-        }
-        else if ($pRefreshToken) {
-            $token = $this->repoRefreshToken->findByIdentifier($pRefreshToken);
-            if (!$token instanceof iEntityRefreshToken)
-                // Token is Revoked!!
-                throw exOAuthServer::invalidCredentials($this->newGrantResponse());
-        }
 
+        } else if ($pRefreshToken) {
+            $token = $this->repoRefreshToken->findByIdentifier($pRefreshToken);
+            if (! $token instanceof iEntityRefreshToken )
+                // Token is Revoked!!
+                throw exOAuthServer::invalidCredentials($this->newGrantResponse());
+        }
 
         $ExpireIn = $token->getDateTimeExpiration();
         $Scope    = $token->getScopes();
 
-
         $AccessToken['meta'] = [];
-        if ($token->isIssuedToResourceOwner()) {
+        if ( $token->isIssuedToResourceOwner() ) {
             $AccessToken['resource_owner'] = $uid = (string) $token->getOwnerIdentifier();
 
             /** @var UserEntity $user */
@@ -132,7 +122,6 @@ class GrantExtensionTokenValidation
 
             $AccessToken['meta'] = $user->getMeta();
         }
-
 
         # Issue Access Token
 
@@ -165,8 +154,7 @@ class GrantExtensionTokenValidation
     {
         return new GrantResponseJson();
     }
-    
-    
+
     // Options:
 
     function setRepoUser(iRepoUsers $repoUser)
@@ -181,7 +169,6 @@ class GrantExtensionTokenValidation
         return $this;
     }
 
-
     // ..
 
     /**
@@ -195,8 +182,8 @@ class GrantExtensionTokenValidation
     {
         try
         {
-            if (!$client->isResidentClient())
-                // Only Resident Clients (Clients belong to Resource Servers) Has Access!
+            if (! $client->isResidentClient() )
+                // Only Resident Clients (Clients belong to Resource Servers) Should Have Access!
                 throw new \Exception;
 
             // Check IP Restriction Or Something Here; If Need !!

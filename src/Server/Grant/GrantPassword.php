@@ -17,6 +17,8 @@ use Psr\Http\Message\ResponseInterface;
 class GrantPassword
     extends aGrant
 {
+    const GrantType = 'password';
+
     /** @var iRepoRefreshTokens */
     protected $repoRefreshToken;
     /** @var iRepoUsers */
@@ -33,7 +35,7 @@ class GrantPassword
      */
     function getGrantType()
     {
-        return 'password';
+        return self::GrantType;
     }
     
     /**
